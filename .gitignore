@@ -1,0 +1,5 @@
+test.x
+test.y
+example*.json
+node_modules
+package-lock.json

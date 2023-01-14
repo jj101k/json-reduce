@@ -1,0 +1,40 @@
+#!/usr/bin/env node
+const path = require("path")
+const crypto = require("crypto")
+const fs = require("fs")
+const Processors = require("./Processors")
+
+const wd = path.dirname(process.argv[1])
+const [filename] = process.argv.slice(2)
+
+function canonicalise_json(contents) {
+    return JSON.stringify(JSON.parse(contents))
+}
+
+const contents = fs.readFileSync(filename, {encoding: "utf-8"})
+
+const sum = crypto.createHash("sha256").update(canonicalise_json(contents)).digest("base64")
+const size = fs.statSync(filename).size
+console.log(filename, sum, size)
+const testers = {
+    reference: [Processors.referenceIn, Processors.referenceOut],
+    deduplicateStrings: [Processors.deduplicateStringsIn, Processors.deduplicateStringsOut],
+    deduplicateStringsSort: [Processors.deduplicateStringsSortIn, Processors.deduplicateStringsOut],
+    deduplicateStringsSortRepass: [Processors.deduplicateStringsSortRepassIn, Processors.deduplicateStringsSortRepassOut],
+}
+for(const [name, [inP, outP]] of Object.entries(testers)) {
+    console.log(name)
+    const a = new Date()
+    const encoded = inP.call(Processors, contents)
+    const b = new Date()
+    const decoded = outP.call(Processors, encoded)
+    const c = new Date()
+
+    const sumi = crypto.createHash("sha256").update(canonicalise_json(decoded)).digest("base64")
+
+    if(sumi != sum) {
+        console.error(`Fail: ${sumi} != ${sum}`)
+    }
+    const sizei = encoded.length
+    console.log(`${sizei} (${sizei * 100 / size}%) ${b-a}ms/${c-b}ms`)
+}
