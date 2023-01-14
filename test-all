@@ -24,7 +24,6 @@ const testers = {
     deduplicateStringsSortRepass: [Processors.deduplicateStringsSortRepassIn, Processors.deduplicateStringsRepassOut],
 }
 for(const [name, [inP, outP]] of Object.entries(testers)) {
-    console.log(name)
     const a = new Date()
     const encoded = inP.call(Processors, contents)
     const b = new Date()
@@ -37,5 +36,5 @@ for(const [name, [inP, outP]] of Object.entries(testers)) {
         console.error(`Fail: ${sumi} != ${sum}`)
     }
     const sizei = encoded.length
-    console.log(`${sizei} (${sizei * 100 / size}%) ${b-a}ms/${c-b}ms`)
+    console.log(`${name}: ${sizei} (${sizei * 100 / size}%) ${b-a}ms/${c-b}ms`)
 }
