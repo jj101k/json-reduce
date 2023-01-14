@@ -25,7 +25,10 @@ const testers = {
 }
 for(const [name, [inP, outP]] of Object.entries(testers)) {
     const a = new Date()
-    const encoded = inP.call(Processors, contents)
+    let encoded = ""
+    for(const e of inP.call(Processors, contents)) {
+        encoded += e
+    }
     const b = new Date()
     const decoded = outP.call(Processors, encoded)
     const c = new Date()

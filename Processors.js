@@ -9,7 +9,14 @@ class Processors {
             return contents
         }
     }
-    static replaceSymbolsIn(contents, re, strings) {
+    /**
+     *
+     * @param {string} contents
+     * @param {RegExp} re
+     * @param {string[]} strings
+     * @returns
+     */
+    static *replaceSymbolsIn(contents, re, strings) {
         // Ordering tokens took 269ms
         // Ordering tokens took 202ms
         // Replacing symbols took 429ms (8ms for map)
@@ -43,31 +50,47 @@ class Processors {
         const stringCode = (_, s) => r.get(s).toString(36)
         const c = new Date()
         try {
-            return contents.replace(re, stringCode)
+            //yield contents.replace(re, stringCode)
         } finally {
             const b = new Date()
             if(this.debug) {
                 console.warn(`Replacing symbols took ${b-a}ms (${c-a}ms for map) with ${strings.length} unique strings`)
             }
-            const cx = contents.split(re)
-            console.warn(`Matches: ${cx.length}`)
-            // console.warn(cx.slice(0, 10).join(' -- '))
-            const bo = Buffer.alloc(Buffer.from(contents).length)
-            let boi = 0
-            let i
-            try {
-                for(i = 0; i < cx.length - 1; i+=2) {
-                    bo.write(cx[i] + stringCode("", cx[i + 1])/*, boi*/)
-                    /*const chunk = Buffer.from(cx[i] + stringCode("", cx[i + 1]))
-                    boi += chunk.length*/
-                }
-                bo.write(cx[cx.length - 1]/*, boi*/)
-            } catch(e) {
-                console.warn(e)
-                console.warn(cx[i], cx[i+1])
-                console.warn(`Looking for ${cx[i+1]}`)
-                console.warn([...r].slice(0, 50))
+            let o = ""
+            let m
+            let lastMatchEnd = 0
+            // console.warn(contents)
+            while(m = re.exec(contents)) {
+                // console.warn([lastMatchEnd, re.lastIndex, m[1], contents.substring(0, re.lastIndex)])
+                const pre = contents.substring(lastMatchEnd, re.lastIndex - m[1].length)
+                lastMatchEnd = re.lastIndex
+                const post = stringCode("", m[1])
+                yield pre + post
+                // console.warn([pre, post])
             }
+            yield contents.substring(lastMatchEnd, contents.length)
+
+            // const cx = contents.split(re)
+            // console.warn(`Matches: ${cx.length}`)
+            // console.warn(cx.slice(0, 10).join(' -- '))
+
+            // const bo = Buffer.alloc(Buffer.from(contents).length)
+            // let boi = 0
+            // let i
+            // try {
+            //     for(i = 0; i < cx.length - 1; i+=2) {
+            //         bo.write(cx[i] + stringCode("", cx[i + 1])/*, boi*/)
+            //         /*const chunk = Buffer.from(cx[i] + stringCode("", cx[i + 1]))
+            //         boi += chunk.length*/
+            //     }
+            //     bo.write(cx[cx.length - 1]/*, boi*/)
+            // } catch(e) {
+            //     console.warn(e)
+            //     console.warn(cx[i], cx[i+1])
+            //     console.warn(`Looking for ${cx[i+1]}`)
+            //     console.warn([...r].slice(0, 50))
+            // }
+
             // let o = ""
             // let i
             // try {
@@ -96,14 +119,12 @@ class Processors {
         }
         return [...seen]
     }
-    static deduplicateStringsIn(contents) {
+    static *deduplicateStringsIn(contents) {
         const contentsShort = this.shortenIfNeeded(contents)
         const stringMatch = /("[^"\\]*(?:\\.[^"\\]*)*"|[a-z0-9]+)/g
         const seen = this.popularTokens(contentsShort, stringMatch)
-        let out = seen.join("\n") + "\n\n"
-        out += this.replaceSymbolsIn(contentsShort, stringMatch, seen)
-
-        return out
+        yield seen.join("\n") + "\n\n"
+        yield *this.replaceSymbolsIn(contentsShort, stringMatch, seen)
     }
     static deduplicateStringsOut(contents) {
         const [header, body] = contents.split(/\n\n/)
@@ -111,14 +132,12 @@ class Processors {
         return this.replaceSymbolsOut(body, strings)
     }
 
-    static deduplicateStringsSortIn(contents) {
+    static *deduplicateStringsSortIn(contents) {
         const contentsShort = this.shortenIfNeeded(contents)
         const stringMatch = /("[^"\\]*(?:\\.[^"\\]*)*"|[a-z0-9]+)/g
         const ordered = this.orderedPopularTokens(contentsShort, stringMatch)
-        let out = ordered.join("\n") + "\n\n"
-        out += this.replaceSymbolsIn(contentsShort, stringMatch, ordered)
-
-        return out
+        yield ordered.join("\n") + "\n\n"
+        yield *this.replaceSymbolsIn(contentsShort, stringMatch, ordered)
     }
 
     static deduplicateStringsRepassOut(contents) {
@@ -144,7 +163,7 @@ class Processors {
             }
         }
     }
-    static deduplicateStringsSortRepassIn(contents) {
+    static *deduplicateStringsSortRepassIn(contents) {
         const contentsShort = this.shortenIfNeeded(contents)
         const stringMatch = /("[^"\\]*(?:\\.[^"\\]*)*"|[a-z0-9]+)/g
         const ordered = this.orderedPopularTokens(contentsShort, stringMatch)
@@ -152,15 +171,14 @@ class Processors {
 
         const wordMatch = /([a-z0-9]+)/gi
         const orderedW = this.orderedPopularTokens(orderedI, wordMatch)
-        let out = orderedW.join("\n") + "\n\n"
+        yield orderedW.join("\n") + "\n\n"
 
-        out += this.replaceSymbolsIn(orderedI, wordMatch, orderedW) + "\n\n"
-        out += this.replaceSymbolsIn(contentsShort, stringMatch, ordered)
-
-        return out
+        yield *this.replaceSymbolsIn(orderedI, wordMatch, orderedW)
+        yield "\n\n"
+        yield *this.replaceSymbolsIn(contentsShort, stringMatch, ordered)
     }
 
-    static deduplicateStringsRepassIn(contents) {
+    static *deduplicateStringsRepassIn(contents) {
         const contentsShort = this.shortenIfNeeded(contents)
         const stringMatch = /("[^"\\]*(?:\\.[^"\\]*)*"|[a-z0-9]+)/g
         const ordered = this.popularTokens(contentsShort, stringMatch)
@@ -168,16 +186,15 @@ class Processors {
 
         const wordMatch = /([a-z0-9]+)/gi
         const orderedW = this.popularTokens(orderedI, wordMatch)
-        let out = orderedW.join("\n") + "\n\n"
+        yield orderedW.join("\n") + "\n\n"
 
-        out += this.replaceSymbolsIn(orderedI, wordMatch, orderedW) + "\n\n"
-        out += this.replaceSymbolsIn(contentsShort, stringMatch, ordered)
-
-        return out
+        yield *this.replaceSymbolsIn(orderedI, wordMatch, orderedW)
+        yield "\n\n"
+        yield *this.replaceSymbolsIn(contentsShort, stringMatch, ordered)
     }
 
     static referenceIn(contents) {
-        return child_process.execSync("gzip -c", {input: contents, maxBuffer: 100_000_000}).toString("base64")
+        return [child_process.execSync("gzip -c", {input: contents, maxBuffer: 100_000_000}).toString("base64")]
     }
 
     static referenceOut(contents) {
