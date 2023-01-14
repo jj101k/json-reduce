@@ -107,8 +107,24 @@ class Processors {
             console.warn(d-b)
         }
     }
-    static replaceSymbolsOut(body, strings) {
-        return body.replace(/([a-z0-9]+)/g, (_, $1) => strings[parseInt($1, 36)])
+    static *replaceSymbolsOut(body, strings) {
+
+        let m
+        let lastMatchEnd = 0
+        // console.warn(contents)
+        const re = /([a-z0-9]+)/g
+        while(m = re.exec(body)) {
+            // console.warn([lastMatchEnd, re.lastIndex, m[1], contents.substring(0, re.lastIndex)])
+            const pre = body.substring(lastMatchEnd, re.lastIndex - m[1].length)
+            lastMatchEnd = re.lastIndex
+            const post = strings[parseInt(m[1], 36)]
+            yield pre + post
+            // console.warn([pre, post])
+        }
+        yield body.substring(lastMatchEnd, body.length)
+
+
+        // return body.replace(/([a-z0-9]+)/g, (_, $1) => strings[parseInt($1, 36)])
     }
     static popularTokens(contents, re) {
         const seen = new Set()
@@ -126,10 +142,10 @@ class Processors {
         yield seen.join("\n") + "\n\n"
         yield *this.replaceSymbolsIn(contentsShort, stringMatch, seen)
     }
-    static deduplicateStringsOut(contents) {
+    static *deduplicateStringsOut(contents) {
         const [header, body] = contents.split(/\n\n/)
         const strings = header.split("\n")
-        return this.replaceSymbolsOut(body, strings)
+        yield *this.replaceSymbolsOut(body, strings)
     }
 
     static *deduplicateStringsSortIn(contents) {
@@ -140,11 +156,18 @@ class Processors {
         yield *this.replaceSymbolsIn(contentsShort, stringMatch, ordered)
     }
 
-    static deduplicateStringsRepassOut(contents) {
+    static *deduplicateStringsRepassOut(contents) {
         const [header1, header2, body] = contents.split(/\n\n/)
         const strings1 = header1.split("\n")
-        const strings = this.replaceSymbolsOut(header2, strings1).split("\n")
-        return this.replaceSymbolsOut(body, strings)
+
+        let stringsI = ""
+        for(const o of this.replaceSymbolsOut(header2, strings1)) {
+            stringsI += o
+        }
+
+        const strings = stringsI.split("\n")
+
+        yield *this.replaceSymbolsOut(body, strings)
     }
 
     static orderedPopularTokens(contents, re) {
@@ -198,7 +221,7 @@ class Processors {
     }
 
     static referenceOut(contents) {
-        return child_process.execSync("gzip -cd", {input: Buffer.from(contents, "base64"), encoding: "utf-8", maxBuffer: 100_000_000})
+        return [child_process.execSync("gzip -cd", {input: Buffer.from(contents, "base64"), encoding: "utf-8", maxBuffer: 100_000_000})]
     }
 }
 

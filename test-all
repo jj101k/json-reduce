@@ -30,7 +30,10 @@ for(const [name, [inP, outP]] of Object.entries(testers)) {
         encoded += e
     }
     const b = new Date()
-    const decoded = outP.call(Processors, encoded)
+    let decoded = ""
+    for(const d of outP.call(Processors, encoded)) {
+        decoded += d
+    }
     const c = new Date()
 
     const sumi = crypto.createHash("sha256").update(canonicalise_json(decoded)).digest("base64")
