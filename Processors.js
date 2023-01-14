@@ -1,6 +1,7 @@
 const child_process = require("child_process")
 
 class Processors {
+    static debug = false
     static shortenIfNeeded(contents) {
         if(contents.match(/^[\[{]\r?\n/s)) {
             return JSON.stringify(JSON.parse(contents))
@@ -9,8 +10,23 @@ class Processors {
         }
     }
     static replaceSymbolsIn(contents, re, strings) {
-        const r = new Map([...strings].map((m, i) => [m, i]))
-        return contents.replace(re, (_, $1) => r.get($1).toString(36))
+        // Ordering tokens took 269ms
+        // Ordering tokens took 202ms
+        // Replacing symbols took 429ms (8ms for map)
+        // Replacing symbols took 516ms (25ms for map)
+        const a = new Date()
+        let c
+        try {
+            const r = new Map([...strings].map((m, i) => [m, i]))
+            const stringCode = (_, s) => r.get(s).toString(36)
+            c = new Date()
+            return contents.replace(re, stringCode)
+        } finally {
+            const b = new Date()
+            if(this.debug) {
+                console.warn(`Replacing symbols took ${b-a}ms (${c-a}ms for map) with ${strings.length} unique strings`)
+            }
+        }
     }
     static replaceSymbolsOut(body, strings) {
         return body.replace(/([a-z0-9]+)/g, (_, $1) => strings[parseInt($1, 36)])
@@ -57,12 +73,20 @@ class Processors {
     }
 
     static orderedPopularTokens(contents, re) {
-        const seen = new Map()
-        for (const m of contents.matchAll(re)) {
-            seen.set(m[1], (seen.get(m[1]) ?? 0) + 1)
-        }
+        const a = new Date()
+        try {
+            const seen = new Map()
+            for (const m of contents.matchAll(re)) {
+                seen.set(m[1], (seen.get(m[1]) ?? 0) + 1)
+            }
 
-        return [...seen.entries()].sort(([ak, av], [bk, bv]) => +bv-av).map(([k]) => k)
+            return [...seen.entries()].sort(([ak, av], [bk, bv]) => +bv-av).map(([k]) => k)
+        } finally {
+            const b = new Date()
+            if(this.debug) {
+                console.warn(`Ordering tokens took ${b-a}ms`)
+            }
+        }
     }
     static deduplicateStringsSortRepassIn(contents) {
         const contentsShort = this.shortenIfNeeded(contents)
