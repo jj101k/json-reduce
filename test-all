@@ -2,7 +2,11 @@
 const path = require("path")
 const crypto = require("crypto")
 const fs = require("fs")
-const Processors = require("./Processors")
+const DeduplicateStrings = require("./Processor/DeduplicateStrings")
+const Reference = require("./Processor/Reference")
+const DeduplicateStringsSort = require("./Processor/DeduplicateStringsSort")
+const DeduplicateStringsSortRepass = require("./Processor/DeduplicateStringsSortRepass")
+const DeduplicateStringsRepass = require("./Processor/DeduplicateStringsRepass")
 
 const wd = path.dirname(process.argv[1])
 const [filename] = process.argv.slice(2)
@@ -17,21 +21,21 @@ const sum = crypto.createHash("sha256").update(canonicalise_json(contents)).dige
 const size = fs.statSync(filename).size
 console.log(filename, sum, size)
 const testers = {
-    reference: [Processors.referenceIn, Processors.referenceOut],
-    deduplicateStrings: [Processors.deduplicateStringsIn, Processors.deduplicateStringsOut],
-    deduplicateStringsSort: [Processors.deduplicateStringsSortIn, Processors.deduplicateStringsOut],
-    deduplicateStringsRepass: [Processors.deduplicateStringsRepassIn, Processors.deduplicateStringsRepassOut],
-    deduplicateStringsSortRepass: [Processors.deduplicateStringsSortRepassIn, Processors.deduplicateStringsRepassOut],
+    reference: Reference,
+    deduplicateStrings: DeduplicateStrings,
+    deduplicateStringsSort: DeduplicateStringsSort,
+    deduplicateStringsRepass: DeduplicateStringsRepass,
+    deduplicateStringsSortRepass: DeduplicateStringsSortRepass,
 }
-for(const [name, [inP, outP]] of Object.entries(testers)) {
+for(const [name, codec] of Object.entries(testers)) {
     const a = new Date()
     let encoded = ""
-    for(const e of inP.call(Processors, contents)) {
+    for(const e of codec.encode(contents)) {
         encoded += e
     }
     const b = new Date()
     let decoded = ""
-    for(const d of outP.call(Processors, encoded)) {
+    for(const d of codec.decode(encoded)) {
         decoded += d
     }
     const c = new Date()
