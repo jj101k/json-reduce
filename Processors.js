@@ -42,12 +42,13 @@ class Processors {
         return out
     }
 
-    static deduplicateStringsSortRepassOut(contents) {
+    static deduplicateStringsRepassOut(contents) {
         const [header1, header2, body] = contents.split(/\n\n/)
         const strings1 = header1.split("\n")
         const strings = this.replaceSymbolsOut(header2, strings1).split("\n")
         return this.replaceSymbolsOut(body, strings)
     }
+
     static orderedPopularTokens(contents, re) {
         const seen = new Map()
         for (const m of contents.matchAll(re)) {
@@ -64,6 +65,22 @@ class Processors {
 
         const wordMatch = /([a-z0-9]+)/gi
         const orderedW = this.orderedPopularTokens(orderedI, wordMatch)
+        let out = orderedW.join("\n") + "\n\n"
+
+        out += this.replaceSymbolsIn(orderedI, wordMatch, orderedW) + "\n\n"
+        out += this.replaceSymbolsIn(contentsShort, stringMatch, ordered)
+
+        return out
+    }
+
+    static deduplicateStringsRepassIn(contents) {
+        const contentsShort = JSON.stringify(JSON.parse(contents))
+        const stringMatch = /("[^"\\]*(?:\\.[^"\\]*)*"|[a-z0-9]+)/g
+        const ordered = this.popularTokens(contentsShort, stringMatch)
+        const orderedI = ordered.join("\n")
+
+        const wordMatch = /([a-z0-9]+)/gi
+        const orderedW = this.popularTokens(orderedI, wordMatch)
         let out = orderedW.join("\n") + "\n\n"
 
         out += this.replaceSymbolsIn(orderedI, wordMatch, orderedW) + "\n\n"
