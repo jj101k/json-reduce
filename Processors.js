@@ -1,6 +1,13 @@
 const child_process = require("child_process")
 
 class Processors {
+    static shortenIfNeeded(contents) {
+        if(contents.match(/^[\[{]\r?\n/s)) {
+            return JSON.stringify(JSON.parse(contents))
+        } else {
+            return contents
+        }
+    }
     static replaceSymbolsIn(contents, re, strings) {
         const r = new Map([...strings].map((m, i) => [m, i]))
         return contents.replace(re, (_, $1) => r.get($1).toString(36))
@@ -18,7 +25,7 @@ class Processors {
         return [...seen]
     }
     static deduplicateStringsIn(contents) {
-        const contentsShort = JSON.stringify(JSON.parse(contents))
+        const contentsShort = this.shortenIfNeeded(contents)
         const stringMatch = /("[^"\\]*(?:\\.[^"\\]*)*"|[a-z0-9]+)/g
         const seen = this.popularTokens(contentsShort, stringMatch)
         let out = seen.join("\n") + "\n\n"
@@ -33,7 +40,7 @@ class Processors {
     }
 
     static deduplicateStringsSortIn(contents) {
-        const contentsShort = JSON.stringify(JSON.parse(contents))
+        const contentsShort = this.shortenIfNeeded(contents)
         const stringMatch = /("[^"\\]*(?:\\.[^"\\]*)*"|[a-z0-9]+)/g
         const ordered = this.orderedPopularTokens(contentsShort, stringMatch)
         let out = ordered.join("\n") + "\n\n"
@@ -58,7 +65,7 @@ class Processors {
         return [...seen.entries()].sort(([ak, av], [bk, bv]) => +bv-av).map(([k]) => k)
     }
     static deduplicateStringsSortRepassIn(contents) {
-        const contentsShort = JSON.stringify(JSON.parse(contents))
+        const contentsShort = this.shortenIfNeeded(contents)
         const stringMatch = /("[^"\\]*(?:\\.[^"\\]*)*"|[a-z0-9]+)/g
         const ordered = this.orderedPopularTokens(contentsShort, stringMatch)
         const orderedI = ordered.join("\n")
@@ -74,7 +81,7 @@ class Processors {
     }
 
     static deduplicateStringsRepassIn(contents) {
-        const contentsShort = JSON.stringify(JSON.parse(contents))
+        const contentsShort = this.shortenIfNeeded(contents)
         const stringMatch = /("[^"\\]*(?:\\.[^"\\]*)*"|[a-z0-9]+)/g
         const ordered = this.popularTokens(contentsShort, stringMatch)
         const orderedI = ordered.join("\n")
