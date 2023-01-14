@@ -24,28 +24,6 @@ class Processors {
         //
         // Roughly 1/3 is map lookup time, 2/3 string build time
         const a = new Date()
-        const rs = []
-        for(let i = 1; i/10 < strings.length; i*=10) {
-            const ip = Math.floor(i/10)
-            const s = strings.slice(ip, i)
-            const r = new Map([...s].map((m, j) => [m, ip + j]))
-            rs.push(r)
-        }
-        const stringCode2 = (_, s) => {
-            for(const r of rs) {
-                const rx = r.get(s)
-                if(rx !== undefined) {
-                    return rx.toString(36)
-                }
-            }
-            for(const i in strings) {
-                if(strings[i] == s) {
-                    console.warn(`Found at ${i}`)
-                }
-            }
-            throw new Error(`Internal error: symbol not found: ${s}`)
-        }
-        const stringCode3 = () => ""
         const r = new Map([...strings].map((m, i) => [m, i]))
         const stringCode = (_, s) => r.get(s).toString(36)
         const c = new Date()
