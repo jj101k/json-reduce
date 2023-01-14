@@ -1,7 +1,7 @@
 const child_process = require("child_process")
 
 class Processors {
-    static debug = false
+    static debug = true
     static shortenIfNeeded(contents) {
         if(contents.match(/^[\[{]\r?\n/s)) {
             return JSON.stringify(JSON.parse(contents))
@@ -14,18 +14,74 @@ class Processors {
         // Ordering tokens took 202ms
         // Replacing symbols took 429ms (8ms for map)
         // Replacing symbols took 516ms (25ms for map)
+        //
+        // Roughly 1/3 is map lookup time, 2/3 string build time
         const a = new Date()
-        let c
+        const rs = []
+        for(let i = 1; i/10 < strings.length; i*=10) {
+            const ip = Math.floor(i/10)
+            const s = strings.slice(ip, i)
+            const r = new Map([...s].map((m, j) => [m, ip + j]))
+            rs.push(r)
+        }
+        const stringCode2 = (_, s) => {
+            for(const r of rs) {
+                const rx = r.get(s)
+                if(rx !== undefined) {
+                    return rx.toString(36)
+                }
+            }
+            for(const i in strings) {
+                if(strings[i] == s) {
+                    console.warn(`Found at ${i}`)
+                }
+            }
+            throw new Error(`Internal error: symbol not found: ${s}`)
+        }
+        const stringCode3 = () => ""
+        const r = new Map([...strings].map((m, i) => [m, i]))
+        const stringCode = (_, s) => r.get(s).toString(36)
+        const c = new Date()
         try {
-            const r = new Map([...strings].map((m, i) => [m, i]))
-            const stringCode = (_, s) => r.get(s).toString(36)
-            c = new Date()
             return contents.replace(re, stringCode)
         } finally {
             const b = new Date()
             if(this.debug) {
                 console.warn(`Replacing symbols took ${b-a}ms (${c-a}ms for map) with ${strings.length} unique strings`)
             }
+            const cx = contents.split(re)
+            console.warn(`Matches: ${cx.length}`)
+            // console.warn(cx.slice(0, 10).join(' -- '))
+            const bo = Buffer.alloc(Buffer.from(contents).length)
+            let boi = 0
+            let i
+            try {
+                for(i = 0; i < cx.length - 1; i+=2) {
+                    bo.write(cx[i] + stringCode("", cx[i + 1])/*, boi*/)
+                    /*const chunk = Buffer.from(cx[i] + stringCode("", cx[i + 1]))
+                    boi += chunk.length*/
+                }
+                bo.write(cx[cx.length - 1]/*, boi*/)
+            } catch(e) {
+                console.warn(e)
+                console.warn(cx[i], cx[i+1])
+                console.warn(`Looking for ${cx[i+1]}`)
+                console.warn([...r].slice(0, 50))
+            }
+            // let o = ""
+            // let i
+            // try {
+            //     for(i = 0; i < cx.length - 1; i+=2) {
+            //         o += cx[i] + stringCode("", cx[i + 1])
+            //     }
+            //     o += cx[cx.length - 1]
+            // } catch(e) {
+            //     console.warn(cx[i], cx[i+1])
+            //     console.warn(`Looking for ${cx[i+1]}`)
+            //     console.warn([...r].slice(0, 50))
+            // }
+            const d = new Date()
+            console.warn(d-b)
         }
     }
     static replaceSymbolsOut(body, strings) {
