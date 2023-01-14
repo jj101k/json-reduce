@@ -23,67 +23,54 @@ class Processors {
         // Replacing symbols took 516ms (25ms for map)
         //
         // Roughly 1/3 is map lookup time, 2/3 string build time
-        const a = new Date()
         const r = new Map([...strings].map((m, i) => [m, i]))
         const stringCode = (_, s) => r.get(s).toString(36)
-        const c = new Date()
-        try {
-            //yield contents.replace(re, stringCode)
-        } finally {
-            const b = new Date()
-            if(this.debug) {
-                console.warn(`Replacing symbols took ${b-a}ms (${c-a}ms for map) with ${strings.length} unique strings`)
-            }
-            let o = ""
-            let m
-            let lastMatchEnd = 0
-            // console.warn(contents)
-            while(m = re.exec(contents)) {
-                // console.warn([lastMatchEnd, re.lastIndex, m[1], contents.substring(0, re.lastIndex)])
-                const pre = contents.substring(lastMatchEnd, re.lastIndex - m[1].length)
-                lastMatchEnd = re.lastIndex
-                const post = stringCode("", m[1])
-                yield pre + post
-                // console.warn([pre, post])
-            }
-            yield contents.substring(lastMatchEnd, contents.length)
-
-            // const cx = contents.split(re)
-            // console.warn(`Matches: ${cx.length}`)
-            // console.warn(cx.slice(0, 10).join(' -- '))
-
-            // const bo = Buffer.alloc(Buffer.from(contents).length)
-            // let boi = 0
-            // let i
-            // try {
-            //     for(i = 0; i < cx.length - 1; i+=2) {
-            //         bo.write(cx[i] + stringCode("", cx[i + 1])/*, boi*/)
-            //         /*const chunk = Buffer.from(cx[i] + stringCode("", cx[i + 1]))
-            //         boi += chunk.length*/
-            //     }
-            //     bo.write(cx[cx.length - 1]/*, boi*/)
-            // } catch(e) {
-            //     console.warn(e)
-            //     console.warn(cx[i], cx[i+1])
-            //     console.warn(`Looking for ${cx[i+1]}`)
-            //     console.warn([...r].slice(0, 50))
-            // }
-
-            // let o = ""
-            // let i
-            // try {
-            //     for(i = 0; i < cx.length - 1; i+=2) {
-            //         o += cx[i] + stringCode("", cx[i + 1])
-            //     }
-            //     o += cx[cx.length - 1]
-            // } catch(e) {
-            //     console.warn(cx[i], cx[i+1])
-            //     console.warn(`Looking for ${cx[i+1]}`)
-            //     console.warn([...r].slice(0, 50))
-            // }
-            const d = new Date()
-            console.warn(d-b)
+        let m
+        let lastMatchEnd = 0
+        // console.warn(contents)
+        while(m = re.exec(contents)) {
+            // console.warn([lastMatchEnd, re.lastIndex, m[1], contents.substring(0, re.lastIndex)])
+            const pre = contents.substring(lastMatchEnd, re.lastIndex - m[1].length)
+            lastMatchEnd = re.lastIndex
+            const post = stringCode("", m[1])
+            yield pre + post
+            // console.warn([pre, post])
         }
+        yield contents.substring(lastMatchEnd, contents.length)
+
+        // const cx = contents.split(re)
+        // console.warn(`Matches: ${cx.length}`)
+        // console.warn(cx.slice(0, 10).join(' -- '))
+
+        // const bo = Buffer.alloc(Buffer.from(contents).length)
+        // let boi = 0
+        // let i
+        // try {
+        //     for(i = 0; i < cx.length - 1; i+=2) {
+        //         bo.write(cx[i] + stringCode("", cx[i + 1])/*, boi*/)
+        //         /*const chunk = Buffer.from(cx[i] + stringCode("", cx[i + 1]))
+        //         boi += chunk.length*/
+        //     }
+        //     bo.write(cx[cx.length - 1]/*, boi*/)
+        // } catch(e) {
+        //     console.warn(e)
+        //     console.warn(cx[i], cx[i+1])
+        //     console.warn(`Looking for ${cx[i+1]}`)
+        //     console.warn([...r].slice(0, 50))
+        // }
+
+        // let o = ""
+        // let i
+        // try {
+        //     for(i = 0; i < cx.length - 1; i+=2) {
+        //         o += cx[i] + stringCode("", cx[i + 1])
+        //     }
+        //     o += cx[cx.length - 1]
+        // } catch(e) {
+        //     console.warn(cx[i], cx[i+1])
+        //     console.warn(`Looking for ${cx[i+1]}`)
+        //     console.warn([...r].slice(0, 50))
+        // }
     }
     static *replaceSymbolsOut(body, strings) {
 
