@@ -8,18 +8,20 @@ class Processors {
     static replaceSymbolsOut(body, strings) {
         return body.replace(/([a-z0-9]+)/g, (_, $1) => strings[parseInt($1, 36)])
     }
+    static popularTokens(contents, re) {
+        const seen = new Set()
+        for (const m of contents.matchAll(re)) {
+            if(!seen.has(m[1])) {
+                seen.add(m[1])
+            }
+        }
+        return [...seen]
+    }
     static deduplicateStringsIn(contents) {
         const contentsShort = JSON.stringify(JSON.parse(contents))
         const stringMatch = /("[^"\\]*(?:\\.[^"\\]*)*"|[a-z0-9]+)/g
-        const seen = new Set()
-        let out = ""
-        for (const m of contentsShort.matchAll(stringMatch)) {
-            if(!seen.has(m[1])) {
-                seen.add(m[1])
-                out += m[1] + "\n"
-            }
-        }
-        out += "\n"
+        const seen = this.popularTokens(contentsShort, stringMatch)
+        let out = seen.join("\n") + "\n\n"
         out += this.replaceSymbolsIn(contentsShort, stringMatch, seen)
 
         return out
@@ -33,12 +35,7 @@ class Processors {
     static deduplicateStringsSortIn(contents) {
         const contentsShort = JSON.stringify(JSON.parse(contents))
         const stringMatch = /("[^"\\]*(?:\\.[^"\\]*)*"|[a-z0-9]+)/g
-        const seen = new Map()
-        for (const m of contentsShort.matchAll(stringMatch)) {
-            seen.set(m[1], (seen.get(m[1]) ?? 0) + 1)
-        }
-
-        const ordered = [...seen.entries()].sort(([ak, av], [bk, bv]) => +bv-av).map(([k]) => k)
+        const ordered = this.orderedPopularTokens(contentsShort, stringMatch)
         let out = ordered.join("\n") + "\n\n"
         out += this.replaceSymbolsIn(contentsShort, stringMatch, ordered)
 
@@ -51,24 +48,22 @@ class Processors {
         const strings = this.replaceSymbolsOut(header2, strings1).split("\n")
         return this.replaceSymbolsOut(body, strings)
     }
-    static deduplicateStringsSortRepassIn(contents) {
-        const contentsShort = JSON.stringify(JSON.parse(contents))
-        const stringMatch = /("[^"\\]*(?:\\.[^"\\]*)*"|[a-z0-9]+)/g
+    static orderedPopularTokens(contents, re) {
         const seen = new Map()
-        for (const m of contentsShort.matchAll(stringMatch)) {
+        for (const m of contents.matchAll(re)) {
             seen.set(m[1], (seen.get(m[1]) ?? 0) + 1)
         }
 
-        const ordered = [...seen.entries()].sort(([ak, av], [bk, bv]) => +bv-av).map(([k]) => k)
+        return [...seen.entries()].sort(([ak, av], [bk, bv]) => +bv-av).map(([k]) => k)
+    }
+    static deduplicateStringsSortRepassIn(contents) {
+        const contentsShort = JSON.stringify(JSON.parse(contents))
+        const stringMatch = /("[^"\\]*(?:\\.[^"\\]*)*"|[a-z0-9]+)/g
+        const ordered = this.orderedPopularTokens(contentsShort, stringMatch)
         const orderedI = ordered.join("\n")
 
         const wordMatch = /([a-z0-9]+)/gi
-        const seenW = new Map()
-        for (const m of orderedI.matchAll(wordMatch)) {
-            seenW.set(m[1], (seenW.get(m[1]) ?? 0) + 1)
-        }
-
-        const orderedW = [...seenW.entries()].sort(([ak, av], [bk, bv]) => +bv-av).map(([k]) => k)
+        const orderedW = this.orderedPopularTokens(orderedI, wordMatch)
         let out = orderedW.join("\n") + "\n\n"
 
         out += this.replaceSymbolsIn(orderedI, wordMatch, orderedW) + "\n\n"
