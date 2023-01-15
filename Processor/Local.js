@@ -5,11 +5,30 @@ class Local {
         const a = new Date()
         try {
             const seen = new Map()
-            for (const m of contents.matchAll(re)) {
-                seen.set(m[1], (seen.get(m[1]) ?? 0) + 1)
+            let i = 0
+
+            let chunks = []
+            let lastMatchEnd = 0
+            let m
+            while(m = re.exec(contents)) {
+                const pre = [lastMatchEnd, re.lastIndex - m[1].length]
+                lastMatchEnd = re.lastIndex
+
+                let s = seen.get(m[1])
+                if(!s) {
+                    s = {c: 0, i: i++}
+                    seen.set(m[1], s)
+                }
+                s.c++
+
+                chunks.push({pre, post: s.i})
             }
 
-            return [...seen.entries()].sort(([ak, av], [bk, bv]) => +bv-av).map(([k]) => k)
+            return {
+                chunks,
+                tokens: [...seen.entries()].sort(([ak, av], [bk, bv]) => +bv.c-av.c).map(([k, v]) => [k, v.i]),
+                lastMatchEnd,
+            }
         } finally {
             const b = new Date()
             if(this.debug) {
@@ -27,6 +46,24 @@ class Local {
         }
         return [...seen]
     }
+
+    /**
+     *
+     * @param {string} contents
+     * @param {RegExp} re
+     * @param {{chunks: {pre: [number, number], post: number}[], tokens: [string, number][]}} tokens
+     * @returns
+     */
+static *replaceSymbolsInX(contents, re, tokens) {
+    const tokenRefOffsets = tokens.tokens.map(([_, i], offset) => [i, offset]).sort(([ai], [bi]) => ai - bi).map(([_, offset]) => offset)
+
+    for(const t of tokens.chunks) {
+        const pre = contents.substring(t.pre[0], t.pre[1])
+        const post = tokenRefOffsets[t.post].toString(36)
+        yield pre + post
+    }
+    yield contents.substring(tokens.lastMatchEnd, contents.length)
+}
 
     /**
      *
