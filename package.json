@@ -1,9 +1,12 @@
 {
   "scripts": {
+    "test": "mocha -r ts-node/register test/**.test.ts",
     "prepare": "tsc"
   },
   "devDependencies": {
+    "@types/mocha": "^10.0.1",
     "@types/node": "^18.11.18",
+    "mocha": "^10.2.0",
     "ts-node-dev": "^2.0.0"
   },
   "dependencies": {
