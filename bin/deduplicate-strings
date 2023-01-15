@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 const fs = require("fs")
 const getopts = require("getopts")
-const DeduplicateStrings = require("./Processor/DeduplicateStrings")
+const DeduplicateStrings = require("../src/Processor/DeduplicateStrings")
 const opts = getopts(process.argv, {
     boolean: ["d"]
 })

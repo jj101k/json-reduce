@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 const fs = require("fs")
 const getopts = require("getopts")
-const DeduplicateStringsSort = require("./Processor/DeduplicateStringsSort")
+const DeduplicateStringsSortRepass = require("../src/Processor/DeduplicateStringsSortRepass")
 
 const opts = getopts(process.argv, {
     boolean: ["d"]
@@ -11,7 +11,7 @@ const [filename] = opts._.slice(2)
 const contents = fs.readFileSync(filename, {encoding: "utf-8"})
 
 if(opts.d) {
-    process.stdout.write(DeduplicateStringsSort.decode(contents))
+    process.stdout.write(DeduplicateStringsSortRepass.decode(contents))
 } else {
-    process.stdout.write(DeduplicateStringsSort.encode(contents))
+    process.stdout.write(DeduplicateStringsSortRepass.encode(contents))
 }
