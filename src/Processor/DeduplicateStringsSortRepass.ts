@@ -1,7 +1,7 @@
-const DeduplicateStringsRepass = require("./DeduplicateStringsRepass")
+import { DeduplicateStringsRepass } from "./DeduplicateStringsRepass"
 
-class DeduplicateStringsSortRepass extends DeduplicateStringsRepass {
-    static *encode(contents) {
+export class DeduplicateStringsSortRepass extends DeduplicateStringsRepass {
+    static *encode(contents: string) {
         const contentsShort = this.shortenIfNeeded(contents)
         const stringMatch = /("[^"\\]*(?:\\.[^"\\]*)*"|[a-z0-9]+)/g
         const ordered = this.orderedPopularTokens(contentsShort, stringMatch)
@@ -16,5 +16,3 @@ class DeduplicateStringsSortRepass extends DeduplicateStringsRepass {
         yield *this.replaceSymbolsInX(contentsShort, stringMatch, ordered)
     }
 }
-
-module.exports = DeduplicateStringsSortRepass

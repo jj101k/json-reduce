@@ -1,23 +1,22 @@
-#!/usr/bin/env node
-const path = require("path")
-const crypto = require("crypto")
-const fs = require("fs")
-const DeduplicateStrings = require("../src/Processor/DeduplicateStrings")
-const Reference = require("../src/Processor/Reference")
-const DeduplicateStringsSort = require("../src/Processor/DeduplicateStringsSort")
-const DeduplicateStringsSortRepass = require("../src/Processor/DeduplicateStringsSortRepass")
-const DeduplicateStringsRepass = require("../src/Processor/DeduplicateStringsRepass")
+import path from "path"
+import * as fs from "fs"
+import { Reference } from "../Processor/Reference"
+import { DeduplicateStrings } from "../Processor/DeduplicateStrings"
+import { DeduplicateStringsSort } from "../Processor/DeduplicateStringsSort"
+import { DeduplicateStringsRepass } from "../Processor/DeduplicateStringsRepass"
+import { DeduplicateStringsSortRepass } from "../Processor/DeduplicateStringsSortRepass"
+import { createHash } from "node:crypto"
 
 const wd = path.dirname(process.argv[1])
 const [filename] = process.argv.slice(2)
 
-function canonicalise_json(contents) {
+function canonicalise_json(contents: string) {
     return JSON.stringify(JSON.parse(contents))
 }
 
 const contents = fs.readFileSync(filename, {encoding: "utf-8"})
 
-const sum = crypto.createHash("sha256").update(canonicalise_json(contents)).digest("base64")
+const sum = createHash("sha256").update(canonicalise_json(contents)).digest("base64")
 const size = fs.statSync(filename).size
 console.log(filename, sum, size)
 const testers = {
@@ -40,11 +39,11 @@ for(const [name, codec] of Object.entries(testers)) {
     }
     const c = new Date()
 
-    const sumi = crypto.createHash("sha256").update(canonicalise_json(decoded)).digest("base64")
+    const sumi = createHash("sha256").update(canonicalise_json(decoded)).digest("base64")
 
     if(sumi != sum) {
         console.error(`Fail: ${sumi} != ${sum}`)
     }
     const sizei = encoded.length
-    console.log(`${name}: ${sizei} (${sizei * 100 / size}%) ${b-a}ms/${c-b}ms`)
+    console.log(`${name}: ${sizei} (${sizei * 100 / size}%) ${b.valueOf()-a.valueOf()}ms/${c.valueOf()-b.valueOf()}ms`)
 }

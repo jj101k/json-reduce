@@ -1,7 +1,7 @@
-const DeduplicateStrings = require("./DeduplicateStrings")
+import { DeduplicateStrings } from "./DeduplicateStrings"
 
-class DeduplicateStringsSort extends DeduplicateStrings {
-    static *encode(contents) {
+export class DeduplicateStringsSort extends DeduplicateStrings {
+    static *encode(contents: string) {
         const contentsShort = this.shortenIfNeeded(contents)
         const stringMatch = /("[^"\\]*(?:\\.[^"\\]*)*"|[a-z0-9]+)/g
         const ordered = this.orderedPopularTokens(contentsShort, stringMatch)
@@ -9,5 +9,3 @@ class DeduplicateStringsSort extends DeduplicateStrings {
         yield *this.replaceSymbolsInX(contentsShort, stringMatch, ordered)
     }
 }
-
-module.exports = DeduplicateStringsSort

@@ -1,46 +1,46 @@
-class Local {
+export class Local {
     static debug = true
 
-    static orderedPopularTokens(contents, re) {
+    static orderedPopularTokens(contents: string, re: RegExp) {
         const a = new Date()
         try {
-            const seen = new Map()
+            const seen = new Map<string, {c: number, i: number}>()
             let i = 0
 
             let chunks = []
             let lastMatchEnd = 0
             let m
-            while(m = re.exec(contents)) {
-                const pre = [lastMatchEnd, re.lastIndex - m[1].length]
+            while (m = re.exec(contents)) {
+                const pre: [number, number] = [lastMatchEnd, re.lastIndex - m[1].length]
                 lastMatchEnd = re.lastIndex
 
                 let s = seen.get(m[1])
-                if(!s) {
-                    s = {c: 0, i: i++}
+                if (!s) {
+                    s = { c: 0, i: i++ }
                     seen.set(m[1], s)
                 }
                 s.c++
 
-                chunks.push({pre, post: s.i})
+                chunks.push({ pre, post: s.i })
             }
 
             return {
                 chunks,
-                tokens: [...seen.entries()].sort(([ak, av], [bk, bv]) => +bv.c-av.c).map(([k, v]) => [k, v.i]),
+                tokens: [...seen.entries()].sort(([ak, av], [bk, bv]) => +bv.c - av.c).map(([k, v]) => <[string, number]>[k, v.i]),
                 lastMatchEnd,
             }
         } finally {
             const b = new Date()
-            if(this.debug) {
-                console.warn(`Ordering tokens took ${b-a}ms`)
+            if (this.debug) {
+                console.warn(`Ordering tokens took ${b.valueOf() - a.valueOf()}ms`)
             }
         }
     }
 
-    static popularTokens(contents, re) {
-        const seen = new Set()
+    static popularTokens(contents: string, re: RegExp) {
+        const seen = new Set<string>()
         for (const m of contents.matchAll(re)) {
-            if(!seen.has(m[1])) {
+            if (!seen.has(m[1])) {
                 seen.add(m[1])
             }
         }
@@ -49,30 +49,30 @@ class Local {
 
     /**
      *
-     * @param {string} contents
-     * @param {RegExp} re
-     * @param {{chunks: {pre: [number, number], post: number}[], tokens: [string, number][]}} tokens
+     * @param contents
+     * @param re
+     * @param tokens
      * @returns
      */
-static *replaceSymbolsInX(contents, re, tokens) {
-    const tokenRefOffsets = tokens.tokens.map(([_, i], offset) => [i, offset]).sort(([ai], [bi]) => ai - bi).map(([_, offset]) => offset)
+    static *replaceSymbolsInX(contents: string, re: RegExp, tokens: { chunks: { pre: [number, number], post: number }[], tokens: [string, number][], lastMatchEnd: number }) {
+        const tokenRefOffsets = tokens.tokens.map(([_, i], offset) => [i, offset]).sort(([ai], [bi]) => ai - bi).map(([_, offset]) => offset)
 
-    for(const t of tokens.chunks) {
-        const pre = contents.substring(t.pre[0], t.pre[1])
-        const post = tokenRefOffsets[t.post].toString(36)
-        yield pre + post
+        for (const t of tokens.chunks) {
+            const pre = contents.substring(t.pre[0], t.pre[1])
+            const post = tokenRefOffsets[t.post].toString(36)
+            yield pre + post
+        }
+        yield contents.substring(tokens.lastMatchEnd, contents.length)
     }
-    yield contents.substring(tokens.lastMatchEnd, contents.length)
-}
 
     /**
      *
-     * @param {string} contents
-     * @param {RegExp} re
-     * @param {string[]} strings
+     * @param contents
+     * @param re
+     * @param strings
      * @returns
      */
-    static *replaceSymbolsIn(contents, re, strings) {
+    static *replaceSymbolsIn(contents: string, re: RegExp, strings: string[]) {
         // Ordering tokens took 269ms
         // Ordering tokens took 202ms
         // Replacing symbols took 429ms (8ms for map)
@@ -80,11 +80,11 @@ static *replaceSymbolsInX(contents, re, tokens) {
         //
         // Roughly 1/3 is map lookup time, 2/3 string build time
         const r = new Map([...strings].map((m, i) => [m, i]))
-        const stringCode = (_, s) => r.get(s).toString(36)
+        const stringCode = (_: any, s: string) => r.get(s)!.toString(36)
         let m
         let lastMatchEnd = 0
         // console.warn(contents)
-        while(m = re.exec(contents)) {
+        while (m = re.exec(contents)) {
             // console.warn([lastMatchEnd, re.lastIndex, m[1], contents.substring(0, re.lastIndex)])
             const pre = contents.substring(lastMatchEnd, re.lastIndex - m[1].length)
             lastMatchEnd = re.lastIndex
@@ -129,13 +129,13 @@ static *replaceSymbolsInX(contents, re, tokens) {
         // }
     }
 
-    static *replaceSymbolsOut(body, strings) {
+    static *replaceSymbolsOut(body: string, strings: string[]) {
 
         let m
         let lastMatchEnd = 0
         // console.warn(contents)
         const re = /([a-z0-9]+)/g
-        while(m = re.exec(body)) {
+        while (m = re.exec(body)) {
             // console.warn([lastMatchEnd, re.lastIndex, m[1], contents.substring(0, re.lastIndex)])
             const pre = body.substring(lastMatchEnd, re.lastIndex - m[1].length)
             lastMatchEnd = re.lastIndex
@@ -149,13 +149,11 @@ static *replaceSymbolsInX(contents, re, tokens) {
         // return body.replace(/([a-z0-9]+)/g, (_, $1) => strings[parseInt($1, 36)])
     }
 
-    static shortenIfNeeded(contents) {
-        if(contents.match(/^[\[{]\r?\n/s)) {
+    static shortenIfNeeded(contents: string) {
+        if (contents.match(/^[\[{]\r?\n/s)) {
             return JSON.stringify(JSON.parse(contents))
         } else {
             return contents
         }
     }
 }
-
-module.exports = Local
