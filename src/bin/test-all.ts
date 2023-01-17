@@ -1,6 +1,5 @@
 import path from "path"
 import * as fs from "fs"
-import { Reference } from "../Processor/Reference"
 import { DeduplicateStrings } from "../Processor/DeduplicateStrings"
 import { DeduplicateStringsSort } from "../Processor/DeduplicateStringsSort"
 import { DeduplicateStringsRepass } from "../Processor/DeduplicateStringsRepass"
@@ -20,7 +19,6 @@ const sum = createHash("sha256").update(canonicalise_json(contents)).digest("bas
 const size = fs.statSync(filename).size
 console.log(filename, sum, size)
 const testers = {
-    reference: Reference,
     deduplicateStrings: DeduplicateStrings,
     deduplicateStringsSort: DeduplicateStringsSort,
     deduplicateStringsRepass: DeduplicateStringsRepass,
