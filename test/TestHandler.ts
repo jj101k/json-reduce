@@ -30,7 +30,9 @@ export class TestHandler {
             })
             it("encodes to a reasonable size", () => {
                 const contents = ReferenceStats.getContents()
-                assert(encodedCached!.length < reference.ratio * contents.length * 3, `Encode ratio ${encodedCached!.length * 100 / contents.length} is less than 3x ${reference.ratio}`)
+                const encodeRatio = Math.round((encodedCached!.length * 100 / contents.length) * 10) / 10
+                console.log(`Encode ratio for ${name} is ${encodeRatio}%`)
+                assert(encodeRatio < reference.ratio * 100 * 3, `Encode ratio ${encodeRatio}% is less than 3x ${reference.ratio * 100}%`)
             })
             it("can decode what it encodes in reasonable time", function() {
                 this.slow(reference.decode * decodeThreshold / 2)
