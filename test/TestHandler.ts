@@ -22,11 +22,17 @@ export class TestHandler {
 
                 const contents = ReferenceStats.getContents()
 
+                const a = new Date()
+
                 let encoded = ""
                 for(const e of driver.encode(contents)) {
                     encoded += e
                 }
                 encodedCached = encoded
+
+                const b = new Date()
+
+                console.log(`Encode time for ${name} is ${(b.valueOf() - a.valueOf())}ms, versus ${reference.encode}ms`)
             })
             it("encodes to a reasonable size", () => {
                 const contents = ReferenceStats.getContents()
