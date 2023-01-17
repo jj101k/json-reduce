@@ -43,5 +43,5 @@ for(const [name, codec] of Object.entries(testers)) {
         console.error(`Fail: ${sumi} != ${sum}`)
     }
     const sizei = encoded.length
-    console.log(`${name}: ${sizei} (${sizei * 100 / size}%) ${b.valueOf()-a.valueOf()}ms/${c.valueOf()-b.valueOf()}ms`)
+    console.log(`${name}: ${sizei} (${(sizei * 100 / size).toFixed(1)}%) ${b.valueOf()-a.valueOf()}ms/${c.valueOf()-b.valueOf()}ms`)
 }
