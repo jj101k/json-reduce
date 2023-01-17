@@ -1,6 +1,6 @@
 import * as fs from "fs"
 import { createHash } from "node:crypto"
-import pako from "pako"
+import { ReferencePureJS } from "./ReferencePureJS"
 
 export class ReferenceStats {
     private static contents?: string
@@ -35,10 +35,15 @@ export class ReferenceStats {
                 const size = contents.length
 
                 const a = new Date()
-                const encoded = Buffer.from(pako.gzip(contents)).toString("base64")
+                let encoded = ""
+                for(const e of ReferencePureJS.encode(contents)) {
+                    encoded += e
+                }
                 const b = new Date()
-
-                const decoded = pako.inflate(Buffer.from(encoded, "base64"))
+                let decoded = ""
+                for(const d of ReferencePureJS.decode(encoded)) {
+                    decoded += d
+                }
                 const c = new Date()
 
                 const sumi = createHash("sha256").update(decoded).digest("base64")
