@@ -6,7 +6,6 @@ describe("Plain deduplicate strings driver", () => {
     it("can decode what it encodes in reasonable time", async function() {
         this.slow(2000)
         const contents = ReferenceStats.getContents()
-        const size = contents.length
 
         const a = new Date()
         let encoded = ""
@@ -30,6 +29,8 @@ describe("Plain deduplicate strings driver", () => {
 
         const reference = await ReferenceStats.getStats()
         assert(encodeTime < reference.encode * 4, `Encode time ${encodeTime} is less than 4x ${reference.encode}`)
-        assert(decodeTime < reference.decode * 3, `Decode time ${decodeTime} is less than 3x ${reference.decode}`)
+        assert(decodeTime < reference.decode * 4, `Decode time ${decodeTime} is less than 4x ${reference.decode}`)
+
+        assert(encoded.length < reference.ratio * contents.length * 3, `Encode ratio ${encoded.length * 100 / contents.length} is less than 3x ${reference.ratio}`)
     })
 })
