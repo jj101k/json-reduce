@@ -25,10 +25,10 @@ export class ReferenceStats {
     static getSize() {
         return this.getContents().length
     }
-    private static stats: Promise<{decode: number, encode: number, ratio: number}>
-    static async getStats() {
+    private static stats: {decode: number, encode: number, ratio: number} | undefined
+    static getStats() {
         if(!this.stats) {
-            this.stats = (async () => {
+            this.stats = (() => {
                 const contents = this.getContents()
 
                 const sum = createHash("sha256").update(contents).digest("base64")

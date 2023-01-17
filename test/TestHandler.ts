@@ -12,37 +12,41 @@ export class TestHandler {
      */
     static testDriver(name: string, driver: {decode(s: string): Generator<string> | string[], encode(s: string): Generator<string> | string[]}) {
         const decodeThreshold = 7
+        let decodedCached: string | null = null
+        let encodedCached: string | null = null
         describe(`${name} driver`, () => {
-            it("can decode what it encodes in reasonable time", async function() {
-                this.slow(2000)
-                this.timeout(5000)
+            const reference = ReferenceStats.getStats()
+            it("can encode", function() {
+                this.slow(reference.encode * 2)
+                this.timeout(reference.encode * 4)
+
                 const contents = ReferenceStats.getContents()
 
-                const a = new Date()
                 let encoded = ""
                 for(const e of driver.encode(contents)) {
                     encoded += e
                 }
-                const b = new Date()
+                encodedCached = encoded
+            })
+            it("encodes to a reasonable size", () => {
+                const contents = ReferenceStats.getContents()
+                assert(encodedCached!.length < reference.ratio * contents.length * 3, `Encode ratio ${encodedCached!.length * 100 / contents.length} is less than 3x ${reference.ratio}`)
+            })
+            it("can decode what it encodes in reasonable time", function() {
+                this.slow(reference.decode * decodeThreshold / 2)
+                this.timeout(reference.decode * decodeThreshold)
+
                 let decoded = ""
-                for(const d of driver.decode(encoded)) {
+                for(const d of driver.decode(encodedCached!)) {
                     decoded += d
                 }
-                const c = new Date()
-
-                const encodeTime = b.valueOf() - a.valueOf()
-                const decodeTime = c.valueOf() - b.valueOf()
-
-                const sumi = ReferenceStats.getCanonicalSumFor(decoded)
+                decodedCached = decoded
+            })
+            it("decodes to a compatible form", () => {
+                const sumi = ReferenceStats.getCanonicalSumFor(decodedCached!)
                 const sum = ReferenceStats.getCanonicalSum()
 
                 assert(sumi == sum, `End file ${sumi} == ${sum}`)
-
-                const reference = await ReferenceStats.getStats()
-                assert(encodeTime < reference.encode * 4, `Encode time ${encodeTime} is less than 4x ${reference.encode}`)
-                assert(decodeTime < reference.decode * decodeThreshold, `Decode time ${decodeTime} is less than ${decodeThreshold}x ${reference.decode}`)
-
-                assert(encoded.length < reference.ratio * contents.length * 3, `Encode ratio ${encoded.length * 100 / contents.length} is less than 3x ${reference.ratio}`)
             })
         })
     }
