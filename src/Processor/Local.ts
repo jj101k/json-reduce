@@ -83,70 +83,27 @@ export class Local {
         const stringCode = (_: any, s: string) => r.get(s)!.toString(36)
         let m
         let lastMatchEnd = 0
-        // console.warn(contents)
         while (m = re.exec(contents)) {
-            // console.warn([lastMatchEnd, re.lastIndex, m[1], contents.substring(0, re.lastIndex)])
             const pre = contents.substring(lastMatchEnd, re.lastIndex - m[1].length)
             lastMatchEnd = re.lastIndex
             const post = stringCode("", m[1])
             yield pre + post
-            // console.warn([pre, post])
         }
         yield contents.substring(lastMatchEnd, contents.length)
-
-        // const cx = contents.split(re)
-        // console.warn(`Matches: ${cx.length}`)
-        // console.warn(cx.slice(0, 10).join(' -- '))
-
-        // const bo = Buffer.alloc(Buffer.from(contents).length)
-        // let boi = 0
-        // let i
-        // try {
-        //     for(i = 0; i < cx.length - 1; i+=2) {
-        //         bo.write(cx[i] + stringCode("", cx[i + 1])/*, boi*/)
-        //         /*const chunk = Buffer.from(cx[i] + stringCode("", cx[i + 1]))
-        //         boi += chunk.length*/
-        //     }
-        //     bo.write(cx[cx.length - 1]/*, boi*/)
-        // } catch(e) {
-        //     console.warn(e)
-        //     console.warn(cx[i], cx[i+1])
-        //     console.warn(`Looking for ${cx[i+1]}`)
-        //     console.warn([...r].slice(0, 50))
-        // }
-
-        // let o = ""
-        // let i
-        // try {
-        //     for(i = 0; i < cx.length - 1; i+=2) {
-        //         o += cx[i] + stringCode("", cx[i + 1])
-        //     }
-        //     o += cx[cx.length - 1]
-        // } catch(e) {
-        //     console.warn(cx[i], cx[i+1])
-        //     console.warn(`Looking for ${cx[i+1]}`)
-        //     console.warn([...r].slice(0, 50))
-        // }
     }
 
     static *replaceSymbolsOut(body: string, strings: string[]) {
 
         let m
         let lastMatchEnd = 0
-        // console.warn(contents)
         const re = /([a-z0-9]+)/g
         while (m = re.exec(body)) {
-            // console.warn([lastMatchEnd, re.lastIndex, m[1], contents.substring(0, re.lastIndex)])
             const pre = body.substring(lastMatchEnd, re.lastIndex - m[1].length)
             lastMatchEnd = re.lastIndex
             const post = strings[parseInt(m[1], 36)]
             yield pre + post
-            // console.warn([pre, post])
         }
         yield body.substring(lastMatchEnd, body.length)
-
-
-        // return body.replace(/([a-z0-9]+)/g, (_, $1) => strings[parseInt($1, 36)])
     }
 
     static shortenIfNeeded(contents: string) {
