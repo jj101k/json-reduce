@@ -38,23 +38,47 @@ export class Local {
     }
 
     static popularTokens(contents: string, re: RegExp) {
-        const seen = new Set<string>()
-        for (const m of contents.matchAll(re)) {
-            if (!seen.has(m[1])) {
-                seen.add(m[1])
+        const a = new Date()
+        try {
+            const seen = new Map<string, {i: number}>()
+            let i = 0
+
+            let chunks = []
+            let lastMatchEnd = 0
+            let m
+            while (m = re.exec(contents)) {
+                const pre: [number, number] = [lastMatchEnd, re.lastIndex - m[1].length]
+                lastMatchEnd = re.lastIndex
+
+                let s = seen.get(m[1])
+                if (!s) {
+                    s = { i: i++ }
+                    seen.set(m[1], s)
+                }
+
+                chunks.push({ pre, post: s.i })
+            }
+
+            return {
+                chunks,
+                tokens: [...seen.entries()].map(([k, v]) => <[string, number]>[k, v.i]),
+                lastMatchEnd,
+            }
+        } finally {
+            const b = new Date()
+            if (this.debug) {
+                console.warn(`Finding tokens took ${b.valueOf() - a.valueOf()}ms`)
             }
         }
-        return [...seen]
     }
 
     /**
      *
      * @param contents
-     * @param re
      * @param tokens
      * @returns
      */
-    static *replaceSymbolsInX(contents: string, re: RegExp, tokens: { chunks: { pre: [number, number], post: number }[], tokens: [string, number][], lastMatchEnd: number }) {
+    static *replaceSymbolsIn(contents: string, tokens: { chunks: { pre: [number, number], post: number }[], tokens: [string, number][], lastMatchEnd: number }) {
         const tokenRefOffsets = tokens.tokens.map(([_, i], offset) => [i, offset]).sort(([ai], [bi]) => ai - bi).map(([_, offset]) => offset)
 
         for (const t of tokens.chunks) {
@@ -65,35 +89,7 @@ export class Local {
         yield contents.substring(tokens.lastMatchEnd, contents.length)
     }
 
-    /**
-     *
-     * @param contents
-     * @param re
-     * @param strings
-     * @returns
-     */
-    static *replaceSymbolsIn(contents: string, re: RegExp, strings: string[]) {
-        // Ordering tokens took 269ms
-        // Ordering tokens took 202ms
-        // Replacing symbols took 429ms (8ms for map)
-        // Replacing symbols took 516ms (25ms for map)
-        //
-        // Roughly 1/3 is map lookup time, 2/3 string build time
-        const r = new Map([...strings].map((m, i) => [m, i]))
-        const stringCode = (_: any, s: string) => r.get(s)!.toString(36)
-        let m
-        let lastMatchEnd = 0
-        while (m = re.exec(contents)) {
-            const pre = contents.substring(lastMatchEnd, re.lastIndex - m[1].length)
-            lastMatchEnd = re.lastIndex
-            const post = stringCode("", m[1])
-            yield pre + post
-        }
-        yield contents.substring(lastMatchEnd, contents.length)
-    }
-
     static *replaceSymbolsOut(body: string, strings: string[]) {
-
         let m
         let lastMatchEnd = 0
         const re = /([a-z0-9]+)/g

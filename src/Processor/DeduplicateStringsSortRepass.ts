@@ -11,8 +11,8 @@ export class DeduplicateStringsSortRepass extends DeduplicateStringsRepass {
         const orderedW = this.orderedPopularTokens(orderedI, wordMatch)
         yield orderedW.tokens.map(([k]) => k).join("\n") + "\n\n"
 
-        yield *this.replaceSymbolsInX(orderedI, wordMatch, orderedW)
+        yield *this.replaceSymbolsIn(orderedI, orderedW)
         yield "\n\n"
-        yield *this.replaceSymbolsInX(contentsShort, stringMatch, ordered)
+        yield *this.replaceSymbolsIn(contentsShort, ordered)
     }
 }

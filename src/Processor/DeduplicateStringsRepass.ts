@@ -19,14 +19,14 @@ export class DeduplicateStringsRepass extends Local {
         const contentsShort = this.shortenIfNeeded(contents)
         const stringMatch = /("[^"\\]*(?:\\.[^"\\]*)*"|[a-z0-9]+)/g
         const ordered = this.popularTokens(contentsShort, stringMatch)
-        const orderedI = ordered.join("\n")
+        const orderedI = ordered.tokens.map(([k]) => k).join("\n")
 
         const wordMatch = /([a-z0-9]+)/gi
         const orderedW = this.popularTokens(orderedI, wordMatch)
-        yield orderedW.join("\n") + "\n\n"
+        yield orderedW.tokens.map(([k]) => k).join("\n") + "\n\n"
 
-        yield *this.replaceSymbolsIn(orderedI, wordMatch, orderedW)
+        yield *this.replaceSymbolsIn(orderedI, orderedW)
         yield "\n\n"
-        yield *this.replaceSymbolsIn(contentsShort, stringMatch, ordered)
+        yield *this.replaceSymbolsIn(contentsShort, ordered)
     }
 }

@@ -5,8 +5,8 @@ export class DeduplicateStrings extends Local {
         const contentsShort = this.shortenIfNeeded(contents)
         const stringMatch = /("[^"\\]*(?:\\.[^"\\]*)*"|[a-z0-9]+)/g
         const seen = this.popularTokens(contentsShort, stringMatch)
-        yield seen.join("\n") + "\n\n"
-        yield *this.replaceSymbolsIn(contentsShort, stringMatch, seen)
+        yield seen.tokens.map(([k]) => k).join("\n") + "\n\n"
+        yield *this.replaceSymbolsIn(contentsShort, seen)
     }
     static *decode(contents: string) {
         const [header, body] = contents.split(/\n\n/)
