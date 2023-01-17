@@ -10,7 +10,7 @@ export class TestHandler {
      * @param name
      * @param driver
      */
-    static testDriver(name: string, driver: {decode(s: string): Generator<string> | string[], encode(s: string): Generator<string> | string[]}) {
+    static testDriver(name: string, driver: {decode(s: string): Iterable<string>, encode(s: string): Iterable<string>}) {
         const decodeThreshold = 7
         let decodedCached: string | null = null
         let encodedCached: string | null = null
