@@ -1,6 +1,6 @@
-import { DeduplicateStrings } from "./DeduplicateStrings"
+import { SinglePass } from "./SinglePass"
 
-export class DeduplicateStringsSort extends DeduplicateStrings {
+export class DeduplicateStringsSort extends SinglePass {
     static orderedPopularTokens(contents: string, re: RegExp) {
         const a = new Date()
         try {

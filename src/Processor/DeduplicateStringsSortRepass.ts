@@ -1,6 +1,6 @@
-import { DeduplicateStringsRepass } from "./DeduplicateStringsRepass"
+import { MultiPass } from "./MultiPass"
 
-export class DeduplicateStringsSortRepass extends DeduplicateStringsRepass {
+export class DeduplicateStringsSortRepass extends MultiPass {
     static orderedPopularTokens(contents: string, re: RegExp) {
         const a = new Date()
         try {
