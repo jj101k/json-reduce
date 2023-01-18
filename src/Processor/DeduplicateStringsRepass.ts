@@ -1,18 +1,39 @@
-import { Local } from "./Local"
+import { MultiPass } from "./MultiPass"
 
-export class DeduplicateStringsRepass extends Local {
-    static *decode(contents: string) {
-        const [header1, header2, body] = contents.split(/\n\n/)
-        const strings1 = header1.split("\n")
+export class DeduplicateStringsRepass extends MultiPass {
+    static popularTokens(contents: string, re: RegExp) {
+        const a = new Date()
+        try {
+            const seen = new Map<string, {i: number}>()
+            let i = 0
 
-        let stringsI = ""
-        for(const o of this.replaceSymbolsOut(header2, strings1)) {
-            stringsI += o
+            let chunks = []
+            let lastMatchEnd = 0
+            let m
+            while (m = re.exec(contents)) {
+                const pre: [number, number] = [lastMatchEnd, re.lastIndex - m[1].length]
+                lastMatchEnd = re.lastIndex
+
+                let s = seen.get(m[1])
+                if (!s) {
+                    s = { i: i++ }
+                    seen.set(m[1], s)
+                }
+
+                chunks.push({ pre, post: s.i })
+            }
+
+            return {
+                chunks,
+                tokens: [...seen.entries()].map(([k, v]) => <[string, number]>[k, v.i]),
+                lastMatchEnd,
+            }
+        } finally {
+            const b = new Date()
+            if (this.debug) {
+                console.warn(`Finding tokens took ${b.valueOf() - a.valueOf()}ms`)
+            }
         }
-
-        const strings = stringsI.split("\n")
-
-        yield *this.replaceSymbolsOut(body, strings)
     }
 
     static *encode(contents: string) {
