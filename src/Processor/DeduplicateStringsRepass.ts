@@ -1,11 +1,14 @@
 import { MultiPass } from "./MultiPass"
 
 export class DeduplicateStringsRepass extends MultiPass {
-    static popularTokens(contents: string, re: RegExp) {
+    static popularTokens(contents: string, re: RegExp, rex: RegExp) {
         const a = new Date()
         try {
-            const seen = new Map<string, {i: number}>()
+            const seen = new Map<string, {i: number, chunks: any, lastMatchEnd: number}>()
             let i = 0
+
+            const seenL = new Map<string, {i: number}>()
+            let iL = 0
 
             let chunks = []
             let lastMatchEnd = 0
@@ -14,10 +17,27 @@ export class DeduplicateStringsRepass extends MultiPass {
                 const pre: [number, number] = [lastMatchEnd, re.lastIndex - m[1].length]
                 lastMatchEnd = re.lastIndex
 
-                let s = seen.get(m[1])
+                const subString = m[1]
+
+                let s = seen.get(subString)
                 if (!s) {
-                    s = { i: i++ }
-                    seen.set(m[1], s)
+                    let chunks2 = []
+                    let m2
+                    let lastMatchEnd2 = 0
+                    while(m2 = rex.exec(subString)) {
+                        const pre2: [number, number] = [lastMatchEnd2, rex.lastIndex - m2[1].length]
+                        lastMatchEnd2 = rex.lastIndex
+
+                        let s2 = seenL.get(m2[1])
+                        if(!s2) {
+                            s2 = {i: iL++ }
+                            seenL.set(m2[1], s2)
+                        }
+                        chunks2.push({pre: pre2, post: s2.i})
+                    }
+
+                    s = { i: i++, chunks: chunks2, lastMatchEnd: lastMatchEnd2 }
+                    seen.set(subString, s)
                 }
 
                 chunks.push({ pre, post: s.i })
@@ -25,7 +45,8 @@ export class DeduplicateStringsRepass extends MultiPass {
 
             return {
                 chunks,
-                tokens: [...seen.entries()].map(([k, v]) => <[string, number]>[k, v.i]),
+                tokens: [...seen.entries()].map(([k, v]) => <[string, number, any, number]>[k, v.i, v.chunks, v.lastMatchEnd]),
+                tokens2: [...seenL.entries()].map(([k, v]) => <[string, number]>[k, v.i]),
                 lastMatchEnd,
             }
         } finally {
@@ -36,18 +57,49 @@ export class DeduplicateStringsRepass extends MultiPass {
         }
     }
 
+    /**
+     *
+     * @param contents
+     * @param tokens
+     * @returns
+     */
+    static *replaceSymbolsIn(contents: string, tokens: { chunks: { pre: [number, number], post: number }[], tokens: [string, number][], lastMatchEnd: number }) {
+        const tokenRefOffsets = tokens.tokens.map(([_, i], offset) => [i, offset]).sort(([ai], [bi]) => ai - bi).map(([_, offset]) => offset)
+
+        for (const t of tokens.chunks) {
+            const pre = contents.substring(t.pre[0], t.pre[1])
+            const post = tokenRefOffsets[t.post].toString(36)
+            yield pre + post
+        }
+        yield contents.substring(tokens.lastMatchEnd, contents.length)
+    }
+
     static *encode(contents: string) {
         const contentsShort = this.shortenIfNeeded(contents)
         const stringMatch = /("[^"\\]*(?:\\.[^"\\]*)*"|[a-z0-9]+)/g
-        const ordered = this.popularTokens(contentsShort, stringMatch)
-        const orderedI = ordered.tokens.map(([k]) => k).join("\n")
+        const ordered = this.popularTokens(contentsShort, stringMatch, /([a-z0-9]+)/gi)
 
-        const wordMatch = /([a-z0-9]+)/gi
-        const orderedW = this.popularTokens(orderedI, wordMatch)
-        yield orderedW.tokens.map(([k]) => k).join("\n") + "\n\n"
+        yield ordered.tokens2.map(([k]) => k).join("\n") + "\n\n"
 
-        yield *this.replaceSymbolsIn(orderedI, orderedW)
+        const tokenRefOffsets = ordered.tokens2.map(([_, i], offset) => [i, offset]).sort(([ai], [bi]) => ai - bi).map(([_, offset]) => offset)
+
+        for(const [replace, i, chunks, lastMatchEnd] of ordered.tokens) {
+            for(const c of chunks) {
+                const pre = replace.substring(c.pre[0], c.pre[1])
+                const post = tokenRefOffsets[c.post].toString(36)
+                yield pre + post
+            }
+            yield replace.substring(lastMatchEnd, contents.length) + "\n"
+        }
         yield "\n\n"
-        yield *this.replaceSymbolsIn(contentsShort, ordered)
+
+        const tokenRefOffsets2 = ordered.tokens.map(([_, i], offset) => [i, offset]).sort(([ai], [bi]) => ai - bi).map(([_, offset]) => offset)
+
+        for (const t of ordered.chunks) {
+            const pre = contents.substring(t.pre[0], t.pre[1])
+            const post = tokenRefOffsets2[t.post].toString(36)
+            yield pre + post
+        }
+        yield contents.substring(ordered.lastMatchEnd, contents.length)
     }
 }
