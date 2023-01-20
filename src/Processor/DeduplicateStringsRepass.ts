@@ -79,10 +79,18 @@ export class DeduplicateStringsRepass extends MultiPass {
 
         const tokenRefOffsets2 = ordered.tokens.map(([_, i], offset) => [i, offset]).sort(([ai], [bi]) => ai - bi).map(([_, offset]) => offset)
 
+        let buffer = ""
         for (const t of ordered.chunks) {
             const pre = contents.substring(t.pre[0], t.pre[1])
             const post = tokenRefOffsets2[t.post].toString(36)
-            yield pre + post
+            buffer += pre + post
+            if(buffer.length > 65536) {
+                yield buffer
+                buffer = ""
+            }
+        }
+        if(buffer.length > 0) {
+            yield buffer
         }
         yield contents.substring(ordered.lastMatchEnd, contents.length)
     }
