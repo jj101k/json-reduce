@@ -57,23 +57,6 @@ export class DeduplicateStringsRepass extends MultiPass {
         }
     }
 
-    /**
-     *
-     * @param contents
-     * @param tokens
-     * @returns
-     */
-    static *replaceSymbolsIn(contents: string, tokens: { chunks: { pre: [number, number], post: number }[], tokens: [string, number][], lastMatchEnd: number }) {
-        const tokenRefOffsets = tokens.tokens.map(([_, i], offset) => [i, offset]).sort(([ai], [bi]) => ai - bi).map(([_, offset]) => offset)
-
-        for (const t of tokens.chunks) {
-            const pre = contents.substring(t.pre[0], t.pre[1])
-            const post = tokenRefOffsets[t.post].toString(36)
-            yield pre + post
-        }
-        yield contents.substring(tokens.lastMatchEnd, contents.length)
-    }
-
     static *encode(contents: string) {
         const contentsShort = this.shortenIfNeeded(contents)
         const stringMatch = /("[^"\\]*(?:\\.[^"\\]*)*"|[a-z0-9]+)/g
@@ -84,12 +67,13 @@ export class DeduplicateStringsRepass extends MultiPass {
         const tokenRefOffsets = ordered.tokens2.map(([_, i], offset) => [i, offset]).sort(([ai], [bi]) => ai - bi).map(([_, offset]) => offset)
 
         for(const [replace, i, chunks, lastMatchEnd] of ordered.tokens) {
+            let buffer = ""
             for(const c of chunks) {
                 const pre = replace.substring(c.pre[0], c.pre[1])
                 const post = tokenRefOffsets[c.post].toString(36)
-                yield pre + post
+                buffer += pre + post
             }
-            yield replace.substring(lastMatchEnd, contents.length) + "\n"
+            yield buffer + replace.substring(lastMatchEnd, contents.length) + "\n"
         }
         yield "\n\n"
 
