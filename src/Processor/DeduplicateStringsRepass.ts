@@ -77,7 +77,7 @@ export class DeduplicateStringsRepass extends MultiPass {
                 const post = tokenRefOffsets[c.post].toString(36)
                 buffer += pre + post
             }
-            yield buffer + replace.substring(lastMatchEnd, contents.length) + "\n"
+            yield buffer + replace.substring(lastMatchEnd, contentsShort.length) + "\n"
         }
         yield "\n\n"
 
@@ -85,7 +85,7 @@ export class DeduplicateStringsRepass extends MultiPass {
 
         let buffer = ""
         for (const t of ordered.chunks) {
-            const pre = contents.substring(t.pre[0], t.pre[1])
+            const pre = contentsShort.substring(t.pre[0], t.pre[1])
             const post = tokenRefOffsets2[t.post].toString(36)
             buffer += pre + post
             if(buffer.length > 65536) {
@@ -96,6 +96,6 @@ export class DeduplicateStringsRepass extends MultiPass {
         if(buffer.length > 0) {
             yield buffer
         }
-        yield contents.substring(ordered.lastMatchEnd, contents.length)
+        yield contentsShort.substring(ordered.lastMatchEnd)
     }
 }
