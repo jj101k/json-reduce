@@ -42,6 +42,10 @@ export class DeduplicateStringsRepass extends MultiPass {
 
                 chunks.push({ pre, post: s.i })
             }
+            const b = new Date()
+            if (this.debug) {
+                console.warn(`Finding tokens (a) took ${b.valueOf() - a.valueOf()}ms`)
+            }
 
             return {
                 chunks,
