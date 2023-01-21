@@ -10,6 +10,13 @@ export class ReferenceStats {
         }
         return this.contents
     }
+    private static smallContents?: string
+    static getSmallContents() {
+        if(!this.smallContents) {
+            this.smallContents = fs.readFileSync("./package.json", {encoding: "utf-8"})
+        }
+        return this.smallContents
+    }
     static getCanonicalSumFor(contents: string) {
         const canonicalContents = JSON.stringify(JSON.parse(contents))
         return createHash("sha256").update(canonicalContents).digest("base64")
