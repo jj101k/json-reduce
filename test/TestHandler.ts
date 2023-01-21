@@ -27,7 +27,7 @@ export class TestHandler {
                     decoded += d
                 }
                 const sumi = ReferenceStats.getCanonicalSumFor(decoded)
-                const sum = ReferenceStats.getCanonicalSum()
+                const sum = ReferenceStats.getCanonicalSumFor(contents)
 
                 assert(sumi == sum, `End file ${sumi} == ${sum}`)
             })
