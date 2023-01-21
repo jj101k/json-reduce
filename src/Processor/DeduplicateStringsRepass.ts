@@ -4,7 +4,8 @@ export class DeduplicateStringsRepass extends MultiPass {
     static popularTokens(contents: string, re: RegExp, rex: RegExp) {
         const a = new Date()
         try {
-            const seen = new Map<string, {i: number, chunks: any, lastMatchEnd: number}>()
+            const seenA: Array<{chunks: any, lastMatchEnd: number, t: string}> = []
+            const seen = new Map<string, number>()
             let i = 0
 
             const seenL = new Map<string, {i: number}>()
@@ -20,7 +21,7 @@ export class DeduplicateStringsRepass extends MultiPass {
                 const subString = m[1]
 
                 let s = seen.get(subString)
-                if (!s) {
+                if (s === undefined) {
                     let chunks2 = []
                     let m2
                     let lastMatchEnd2 = 0
@@ -35,12 +36,13 @@ export class DeduplicateStringsRepass extends MultiPass {
                         }
                         chunks2.push({pre: pre2, post: s2.i})
                     }
+                    s = i++
 
-                    s = { i: i++, chunks: chunks2, lastMatchEnd: lastMatchEnd2 }
                     seen.set(subString, s)
+                    seenA.push({chunks: chunks2, lastMatchEnd: lastMatchEnd2, t: subString})
                 }
 
-                chunks.push({ pre, post: s.i })
+                chunks.push({ pre, post: s })
             }
             const b = new Date()
             if (this.debug) {
@@ -49,7 +51,7 @@ export class DeduplicateStringsRepass extends MultiPass {
 
             return {
                 chunks,
-                tokens: [...seen.entries()].map(([k, v]) => <[string, number, any, number]>[k, v.i, v.chunks, v.lastMatchEnd]),
+                tokens: seenA.map((v, i) => <[string, number, any, number]>[v.t, i, v.chunks, v.lastMatchEnd]),
                 tokens2: [...seenL.entries()].map(([k, v]) => <[string, number]>[k, v.i]),
                 lastMatchEnd,
             }
