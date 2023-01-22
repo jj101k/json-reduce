@@ -1,5 +1,5 @@
 export abstract class Local {
-    static debug = true
+    static debug = false
 
     static shortenIfNeeded(contents: string) {
         if (contents.match(/^[\[{]\r?\n/s)) {
