@@ -1,7 +1,16 @@
 import { SinglePass } from "./SinglePass"
 
+/**
+ *
+ */
 export class DeduplicateStringsSort extends SinglePass {
-    static orderedPopularTokens(contents: string, re: RegExp) {
+    /**
+     *
+     * @param contents
+     * @param re
+     * @returns
+     */
+    orderedPopularTokens(contents: string, re: RegExp) {
         const a = new Date()
         try {
             const seen = new Map<string, {c: number, i: number}>()
@@ -37,11 +46,15 @@ export class DeduplicateStringsSort extends SinglePass {
         }
     }
 
-    static *encode(contents: string) {
+    /**
+     *
+     * @param contents
+     */
+    *encodeInner(contents: string) {
         const contentsShort = this.shortenIfNeeded(contents)
         const stringMatch = /("[^"\\]*(?:\\.[^"\\]*)*"|[a-z0-9]+)/g
         const ordered = this.orderedPopularTokens(contentsShort, stringMatch)
         yield ordered.tokens.map(([k]) => k).join("\n") + "\n\n"
-        yield *this.replaceSymbolsIn(contentsShort, ordered)
+        return yield *this.replaceSymbolsIn(contentsShort, ordered)
     }
 }

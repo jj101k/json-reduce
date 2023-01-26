@@ -9,12 +9,13 @@ const opts = getopts(process.argv, {
 const [filename] = opts._.slice(2)
 const contents = fs.readFileSync(filename, {encoding: "utf-8"})
 
-let handler: Generator<string>
+const handler = new DeduplicateStringsSort()
+let handlerChunks: Generator<string>
 if(opts.d) {
-    handler = DeduplicateStringsSort.decode(contents)
+    handlerChunks = handler.decode(contents)
 } else {
-    handler = DeduplicateStringsSort.encode(contents)
+    handlerChunks = handler.encode(contents)
 }
-for(const chunk of handler) {
+for(const chunk of handlerChunks) {
     process.stdout.write(chunk)
 }

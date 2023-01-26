@@ -1,7 +1,16 @@
 import { MultiPass } from "./MultiPass"
 
+/**
+ *
+ */
 export class DeduplicateStringsSortRepass extends MultiPass {
-    static orderedPopularTokens(contents: string, re: RegExp) {
+    /**
+     *
+     * @param contents
+     * @param re
+     * @returns
+     */
+    orderedPopularTokens(contents: string, re: RegExp) {
         const a = new Date()
         try {
             const seen = new Map<string, {c: number, i: number}>()
@@ -37,7 +46,7 @@ export class DeduplicateStringsSortRepass extends MultiPass {
         }
     }
 
-    static *encode(contents: string) {
+    *encodeInner(contents: string) {
         const contentsShort = this.shortenIfNeeded(contents)
         const stringMatch = /("[^"\\]*(?:\\.[^"\\]*)*"|[a-z0-9]+)/g
         const ordered = this.orderedPopularTokens(contentsShort, stringMatch)
@@ -47,8 +56,9 @@ export class DeduplicateStringsSortRepass extends MultiPass {
         const orderedW = this.orderedPopularTokens(orderedI, wordMatch)
         yield orderedW.tokens.map(([k]) => k).join("\n") + "\n\n"
 
-        yield *this.replaceSymbolsIn(orderedI, orderedW)
+        const finalChunk = yield *this.replaceSymbolsIn(orderedI, orderedW)
+        yield finalChunk
         yield "\n\n"
-        yield *this.replaceSymbolsIn(contentsShort, ordered)
+        return yield *this.replaceSymbolsIn(contentsShort, ordered)
     }
 }

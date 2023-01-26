@@ -26,13 +26,14 @@ const testers = {
 }
 for(const [name, codec] of Object.entries(testers)) {
     const a = new Date()
+    const handler = new codec()
     let encoded = ""
-    for(const e of codec.encode(contents)) {
+    for(const e of handler.encode(contents)) {
         encoded += e
     }
     const b = new Date()
     let decoded = ""
-    for(const d of codec.decode(encoded)) {
+    for(const d of handler.decode(encoded)) {
         decoded += d
     }
     const c = new Date()

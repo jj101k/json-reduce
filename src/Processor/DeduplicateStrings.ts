@@ -1,7 +1,16 @@
 import { SinglePass } from "./SinglePass"
 
+/**
+ *
+ */
 export class DeduplicateStrings extends SinglePass {
-    static popularTokens(contents: string, re: RegExp) {
+    /**
+     *
+     * @param contents
+     * @param re
+     * @returns
+     */
+    popularTokens(contents: string, re: RegExp) {
         const a = new Date()
         try {
             const seen = new Map<string, {i: number}>()
@@ -36,11 +45,11 @@ export class DeduplicateStrings extends SinglePass {
         }
     }
 
-    static *encode(contents: string) {
+    *encodeInner(contents: string) {
         const contentsShort = this.shortenIfNeeded(contents)
         const stringMatch = /("[^"\\]*(?:\\.[^"\\]*)*"|[a-z0-9]+)/g
         const seen = this.popularTokens(contentsShort, stringMatch)
         yield seen.tokens.map(([k]) => k).join("\n") + "\n\n"
-        yield *this.replaceSymbolsIn(contentsShort, seen)
+        return yield *this.replaceSymbolsIn(contentsShort, seen)
     }
 }

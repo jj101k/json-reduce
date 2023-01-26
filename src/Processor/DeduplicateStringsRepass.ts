@@ -1,7 +1,17 @@
 import { MultiPass } from "./MultiPass"
 
+/**
+ *
+ */
 export class DeduplicateStringsRepass extends MultiPass {
-    static popularTokens(contents: string, re: RegExp, rex: RegExp) {
+    /**
+     *
+     * @param contents
+     * @param re
+     * @param rex
+     * @returns
+     */
+    popularTokens(contents: string, re: RegExp, rex: RegExp) {
         const a = new Date()
         try {
             const seenA: Array<{chunks: any, lastMatchEnd: number, t: string}> = []
@@ -63,7 +73,7 @@ export class DeduplicateStringsRepass extends MultiPass {
         }
     }
 
-    static *encode(contents: string) {
+    *encodeInner(contents: string) {
         const contentsShort = this.shortenIfNeeded(contents)
         const stringMatch = /("[^"\\]*(?:\\.[^"\\]*)*"|[a-z0-9]+)/g
         const ordered = this.popularTokens(contentsShort, stringMatch, /([a-z0-9]+)/gi)
@@ -98,6 +108,6 @@ export class DeduplicateStringsRepass extends MultiPass {
         if(buffer.length > 0) {
             yield buffer
         }
-        yield contentsShort.substring(ordered.lastMatchEnd)
+        return contentsShort.substring(ordered.lastMatchEnd)
     }
 }

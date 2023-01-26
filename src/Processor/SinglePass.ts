@@ -1,13 +1,16 @@
 import { Local } from "./Local"
 
-export class SinglePass extends Local {
+/**
+ *
+ */
+export abstract class SinglePass extends Local {
     /**
      *
      * @param contents
      * @param tokens
      * @returns
      */
-    static *replaceSymbolsIn(contents: string, tokens: { chunks: { pre: [number, number], post: number }[], tokens: [string, number][], lastMatchEnd: number }) {
+    *replaceSymbolsIn(contents: string, tokens: { chunks: { pre: [number, number], post: number }[], tokens: [string, number][], lastMatchEnd: number }) {
         const tokenRefOffsets = tokens.tokens.map(([_, i], offset) => [i, offset]).sort(([ai], [bi]) => ai - bi).map(([_, offset]) => offset)
 
         for (const t of tokens.chunks) {
@@ -15,10 +18,15 @@ export class SinglePass extends Local {
             const post = tokenRefOffsets[t.post].toString(36)
             yield pre + post
         }
-        yield contents.substring(tokens.lastMatchEnd, contents.length)
+        return contents.substring(tokens.lastMatchEnd, contents.length)
     }
 
-    static *replaceSymbolsOut(body: string, strings: string[]) {
+    /**
+     *
+     * @param body
+     * @param strings
+     */
+    *replaceSymbolsOut(body: string, strings: string[]) {
         let m
         let lastMatchEnd = 0
         const re = /([a-z0-9]+)/g
@@ -31,7 +39,7 @@ export class SinglePass extends Local {
         yield body.substring(lastMatchEnd, body.length)
     }
 
-    static *decode(contents: string) {
+    *decode(contents: string) {
         const [header, body] = contents.split(/\n\n/)
         const strings = header.split("\n")
         yield *this.replaceSymbolsOut(body, strings)
