@@ -70,7 +70,7 @@ export class DeduplicateStringsSortRepass extends MultiPass {
             return {
                 chunks,
                 tokens: seenA.sort((a, b) => b.c - a.c).map(v => [v.t, v.s, v.chunks, v.lastMatchEnd]),
-                tokens2: [...seenL.entries()].sort(([ak, av], [bk, bv]) => bv.c - av.c).map(([k, v]) => [k, v.i]),
+                subtokens: [...seenL.entries()].sort(([ak, av], [bk, bv]) => bv.c - av.c).map(([k, v]) => ({token: k, originalReference: v.i})),
                 lastMatchEnd,
             }
         } finally {
@@ -86,9 +86,9 @@ export class DeduplicateStringsSortRepass extends MultiPass {
         const stringMatch = /("[^"\\]*(?:\\.[^"\\]*)*"|[a-z0-9]+)/g
         const ordered = this.orderedPopularTokens(contentsShort, stringMatch, /([a-z0-9]+)/gi)
 
-        yield ordered.tokens2.map(([k]) => k).join("\n") + "\n\n"
+        yield ordered.subtokens.map(({token}) => token).join("\n") + "\n\n"
 
-        const tokenRefOffsets = ordered.tokens2.map(([_, i], offset) => [i, offset]).sort(([ai], [bi]) => ai - bi).map(([_, offset]) => offset)
+        const tokenRefOffsets = ordered.subtokens.map(({originalReference}, offset) => [originalReference, offset]).sort(([ai], [bi]) => ai - bi).map(([_, offset]) => offset)
 
         for(const [replace, i, chunks, lastMatchEnd] of ordered.tokens) {
             let buffer = ""
