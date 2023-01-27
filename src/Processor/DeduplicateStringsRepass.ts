@@ -66,7 +66,7 @@ export class DeduplicateStringsRepass extends MultiPass {
 
             return {
                 chunks,
-                tokens: seenA.map((v, i) => [v.t, i, v.chunks, v.lastMatchEnd]),
+                tokens: seenA.map((v, i) => ({i, ...v})),
                 subtokens: [...seenL.entries()].map(([k, v]) => ({token: k, originalReference: v.i})),
                 lastMatchEnd,
             }
@@ -87,18 +87,18 @@ export class DeduplicateStringsRepass extends MultiPass {
 
         const tokenRefOffsets = ordered.subtokens.map(({originalReference}, offset) => [originalReference, offset]).sort(([ai], [bi]) => ai - bi).map(([_, offset]) => offset)
 
-        for(const [replace, i, chunks, lastMatchEnd] of ordered.tokens) {
+        for(const t of ordered.tokens) {
             let buffer = ""
-            for(const c of chunks) {
-                const pre = replace.substring(c.pre[0], c.pre[1])
+            for(const c of t.chunks) {
+                const pre = t.t.substring(c.pre[0], c.pre[1])
                 const post = tokenRefOffsets[c.post].toString(36)
                 buffer += pre + post
             }
-            yield buffer + replace.substring(lastMatchEnd, contentsShort.length) + "\n"
+            yield buffer + t.t.substring(t.lastMatchEnd, contentsShort.length) + "\n"
         }
         yield "\n\n"
 
-        const tokenRefOffsets2 = ordered.tokens.map(([_, i], offset) => [i, offset]).sort(([ai], [bi]) => ai - bi).map(([_, offset]) => offset)
+        const tokenRefOffsets2 = ordered.tokens.map(({i}, offset) => [i, offset]).sort(([ai], [bi]) => ai - bi).map(([_, offset]) => offset)
 
         let buffer = ""
         for (const t of ordered.chunks) {
