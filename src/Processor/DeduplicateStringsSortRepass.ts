@@ -1,4 +1,9 @@
+import { Chunk } from "./Chunk"
 import { MultiPass } from "./MultiPass"
+import { PopularTokens } from "./PopularTokens"
+import { PreBlock } from "./PreBlock"
+import { SeenInnerThing } from "./SeenInnerThing"
+import { SeenThing } from "./SeenThing"
 
 /**
  *
@@ -11,32 +16,32 @@ export class DeduplicateStringsSortRepass extends MultiPass {
      * @param rex
      * @returns
      */
-    orderedPopularTokens(contents: string, re: RegExp, rex: RegExp) {
+    orderedPopularTokens(contents: string, re: RegExp, rex: RegExp): PopularTokens {
         const a = new Date()
         try {
-            const seenA: Array<{chunks: any, lastMatchEnd: number, t: string, c: number, s: number}> = []
+            const seenA: Array<SeenThing & {c: number, s: number}> = []
             const seen = new Map<string, number>()
             let i = 0
 
-            const seenL = new Map<string, {i: number, c: number}>()
+            const seenL = new Map<string, SeenInnerThing & {c: number}>()
             let iL = 0
 
-            let chunks = []
+            const chunks: Chunk[] = []
             let lastMatchEnd = 0
             let m
             while (m = re.exec(contents)) {
-                const pre: [number, number] = [lastMatchEnd, re.lastIndex - m[1].length]
+                const pre: PreBlock = [lastMatchEnd, re.lastIndex - m[1].length]
                 lastMatchEnd = re.lastIndex
 
                 const subString = m[1]
 
                 let s = seen.get(subString)
                 if (s === undefined) {
-                    let chunks2 = []
+                    const chunks2: Chunk[] = []
                     let m2
                     let lastMatchEnd2 = 0
                     while(m2 = rex.exec(subString)) {
-                        const pre2: [number, number] = [lastMatchEnd2, rex.lastIndex - m2[1].length]
+                        const pre2: PreBlock = [lastMatchEnd2, rex.lastIndex - m2[1].length]
                         lastMatchEnd2 = rex.lastIndex
 
                         let s2 = seenL.get(m2[1])
@@ -64,8 +69,8 @@ export class DeduplicateStringsSortRepass extends MultiPass {
 
             return {
                 chunks,
-                tokens: seenA.sort((a, b) => b.c - a.c).map(v => <[string, number, any, number]>[v.t, v.s, v.chunks, v.lastMatchEnd]),
-                tokens2: [...seenL.entries()].sort(([ak, av], [bk, bv]) => bv.c - av.c).map(([k, v]) => <[string, number]>[k, v.i]),
+                tokens: seenA.sort((a, b) => b.c - a.c).map(v => [v.t, v.s, v.chunks, v.lastMatchEnd]),
+                tokens2: [...seenL.entries()].sort(([ak, av], [bk, bv]) => bv.c - av.c).map(([k, v]) => [k, v.i]),
                 lastMatchEnd,
             }
         } finally {
