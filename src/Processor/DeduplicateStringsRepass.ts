@@ -2,7 +2,6 @@ import { Chunk } from "./Chunk"
 import { MultiPass } from "./MultiPass"
 import { PopularTokens } from "./PopularTokens"
 import { PreBlock } from "./PreBlock"
-import { SeenInnerThing } from "./SeenInnerThing"
 import { SeenThing } from "./SeenThing"
 
 /**
@@ -16,7 +15,7 @@ export class DeduplicateStringsRepass extends MultiPass {
             const seen = new Map<string, number>()
             let i = 0
 
-            const seenL = new Map<string, SeenInnerThing>()
+            const seenL = new Map<string, number>()
             let iL = 0
 
             const chunks: Chunk[] = []
@@ -38,11 +37,11 @@ export class DeduplicateStringsRepass extends MultiPass {
                         lastMatchEnd2 = rex.lastIndex
 
                         let s2 = seenL.get(m2[1])
-                        if(!s2) {
-                            s2 = {originalOffset: iL++ }
+                        if(s2 === undefined) {
+                            s2 = iL++
                             seenL.set(m2[1], s2)
                         }
-                        chunks2.push({pre: pre2, post: s2.originalOffset})
+                        chunks2.push({pre: pre2, post: s2})
                     }
                     s = i++
 
