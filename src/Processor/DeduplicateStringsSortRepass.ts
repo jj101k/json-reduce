@@ -62,15 +62,27 @@ export class DeduplicateStringsSortRepass extends MultiPass {
 
             const subtokens = [...seenL.entries()].sort(([_, av], [__, bv]) => bv.popularity - av.popularity)
 
-            const tokens = seenA.sort((a, b) => b.popularity - a.popularity)
+            // Build abstract popularity
+            let ix = subtokens.length
+            for(const [, st] of subtokens) {
+                st.popularity = --ix
+            }
+
+            const tokens = seenA.slice().sort((a, b) => b.popularity - a.popularity)
+
+            // Build abstract popularity
+            ix = tokens.length
+            for(const t of tokens) {
+                t.popularity = --ix
+            }
 
             return {
                 chunks,
                 tokens,
                 lastMatchEnd,
                 subtokenBlock: subtokens.map(([k]) => k).join("\n"),
-                subtokenOffsets: subtokens.map(([, {originalOffset: i}], offset) => [i, offset]).sort(([ai], [bi]) => bi - ai).map(([_, offset]) => offset),
-                tokenOffsets: tokens.map(({popularity: c}, offset) => [c, offset]).sort(([ai], [bi]) => bi - ai).map(([_, offset]) => offset),
+                subtokenOffsets: [...seenL.values()].map(({popularity}) => seenL.size - popularity - 1),
+                tokenOffsets: seenA.map(({popularity}) => seenA.length - popularity - 1),
             }
         } finally {
             const b = new Date()
