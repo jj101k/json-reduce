@@ -1,7 +1,22 @@
 import { Chunk } from "./Chunk"
 import { MultiPass } from "./MultiPass"
 import { PopularTokens } from "./PopularTokens"
-import { SeenThing } from "./SeenThing"
+import { SeenToken } from "./SeenToken"
+
+/**
+ *
+ */
+interface SeenPopularSubtoken {
+    popularity: number
+    token: string
+}
+
+/**
+ *
+ */
+interface SeenPopularToken extends SeenToken {
+    popularity: number
+}
 
 /**
  *
@@ -26,11 +41,11 @@ export class DeduplicateStringsSortRepass extends MultiPass {
     popularTokens(contents: string, findTokens: RegExp, findSubtokens: RegExp): PopularTokens {
         const a = new Date()
         try {
-            const tokensFound: Array<SeenThing & {popularity: number}> = []
+            const tokensFound: Array<SeenPopularToken> = []
             const tokenFoundOffsets = new Map<string, number>()
             let currentToken = 0
 
-            const subtokensFound: Array<{popularity: number, token: string}> = []
+            const subtokensFound: Array<SeenPopularSubtoken> = []
             const subtokenFoundOffsets = new Map<string, number>()
             let currentSubtoken = 0
 

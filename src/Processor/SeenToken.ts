@@ -3,7 +3,7 @@ import { Chunk } from "./Chunk"
 /**
  *
  */
-export interface SeenThing {
+export interface SeenToken {
     chunks: Chunk[]
     lastMatchEnd: number
     token: string
