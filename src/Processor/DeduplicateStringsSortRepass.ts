@@ -7,6 +7,22 @@ import { SeenThing } from "./SeenThing"
  *
  */
 export class DeduplicateStringsSortRepass extends MultiPass {
+    /**
+     *
+     * @param ts
+     */
+    private popularSortWriteBack<T extends {popularity: number}>(ts: T[]) {
+        const sorted = ts.slice().sort((av, bv) => bv.popularity - av.popularity)
+
+        // Build abstract popularity
+        let effectivePopularity = sorted.length
+        for(const st of sorted) {
+            st.popularity = --effectivePopularity
+        }
+
+        return sorted
+    }
+
     popularTokens(contents: string, findTokens: RegExp, findSubtokens: RegExp): PopularTokens {
         const a = new Date()
         try {
@@ -64,21 +80,9 @@ export class DeduplicateStringsSortRepass extends MultiPass {
                 console.warn(`Finding tokens (a) took ${b.valueOf() - a.valueOf()}ms`)
             }
 
-            const subtokens = subtokensFound.slice().sort((av, bv) => bv.popularity - av.popularity)
+            const subtokens = this.popularSortWriteBack(subtokensFound)
 
-            // Build abstract popularity
-            let ix = subtokens.length
-            for(const st of subtokens) {
-                st.popularity = --ix
-            }
-
-            const tokens = tokensFound.slice().sort((a, b) => b.popularity - a.popularity)
-
-            // Build abstract popularity
-            ix = tokens.length
-            for(const t of tokens) {
-                t.popularity = --ix
-            }
+            const tokens = this.popularSortWriteBack(tokensFound)
 
             return {
                 chunks,
