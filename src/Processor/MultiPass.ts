@@ -53,23 +53,6 @@ export abstract class MultiPass extends Local {
 
     /**
      *
-     * @param contents
-     * @param tokens
-     * @returns
-     */
-    *replaceSymbolsIn(contents: string, tokens: { chunks: { pre: [number, number], post: number }[], tokens: [string, number][], lastMatchEnd: number }) {
-        const tokenRefOffsets = tokens.tokens.map(([_, i], offset) => [i, offset]).sort(([ai], [bi]) => ai - bi).map(([_, offset]) => offset)
-
-        for (const t of tokens.chunks) {
-            const pre = contents.substring(t.pre[0], t.pre[1])
-            const post = tokenRefOffsets[t.post].toString(36)
-            yield pre + post
-        }
-        return contents.substring(tokens.lastMatchEnd, contents.length)
-    }
-
-    /**
-     *
      * @param body
      * @param strings
      */
