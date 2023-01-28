@@ -39,10 +39,10 @@ export class DeduplicateStringsRepass extends MultiPass {
 
                         let s2 = seenL.get(m2[1])
                         if(!s2) {
-                            s2 = {i: iL++ }
+                            s2 = {originalOffset: iL++ }
                             seenL.set(m2[1], s2)
                         }
-                        chunks2.push({pre: pre2, post: s2.i})
+                        chunks2.push({pre: pre2, post: s2.originalOffset})
                     }
                     s = i++
 
