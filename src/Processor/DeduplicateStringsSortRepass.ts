@@ -12,11 +12,11 @@ export class DeduplicateStringsSortRepass extends MultiPass {
     popularTokens(contents: string, re: RegExp, rex: RegExp): PopularTokens {
         const a = new Date()
         try {
-            const seenA: Array<SeenThing & {c: number, s: number}> = []
+            const seenA: Array<SeenThing & {popularity: number}> = []
             const seen = new Map<string, number>()
             let i = 0
 
-            const seenL = new Map<string, SeenInnerThing & {c: number}>()
+            const seenL = new Map<string, SeenInnerThing & {popularity: number}>()
             let iL = 0
 
             const chunks: Chunk[] = []
@@ -39,19 +39,19 @@ export class DeduplicateStringsSortRepass extends MultiPass {
 
                         let s2 = seenL.get(m2[1])
                         if(!s2) {
-                            s2 = {i: iL++, c: 0 }
+                            s2 = {originalOffset: iL++, popularity: 0 }
                             seenL.set(m2[1], s2)
                         }
-                        s2.c++
-                        chunks2.push({pre: pre2, post: s2.i})
+                        s2.popularity++
+                        chunks2.push({pre: pre2, post: s2.originalOffset})
                     }
                     s = i++
 
                     seen.set(subString, s)
-                    seenA.push({chunks: chunks2, lastMatchEnd: lastMatchEnd2, token: subString, c: 0, s})
+                    seenA.push({chunks: chunks2, lastMatchEnd: lastMatchEnd2, token: subString, popularity: 0})
                 }
 
-                seenA[s].c++
+                seenA[s].popularity++
 
                 chunks.push({ pre, post: s })
             }
@@ -60,17 +60,17 @@ export class DeduplicateStringsSortRepass extends MultiPass {
                 console.warn(`Finding tokens (a) took ${b.valueOf() - a.valueOf()}ms`)
             }
 
-            const subtokens = [...seenL.entries()].sort(([_, av], [__, bv]) => bv.c - av.c)
+            const subtokens = [...seenL.entries()].sort(([_, av], [__, bv]) => bv.popularity - av.popularity)
 
-            const tokens = seenA.sort((a, b) => b.c - a.c)
+            const tokens = seenA.sort((a, b) => b.popularity - a.popularity)
 
             return {
                 chunks,
                 tokens,
                 lastMatchEnd,
                 subtokenBlock: subtokens.map(([k]) => k).join("\n"),
-                subtokenOffsets: subtokens.map(([, {i}], offset) => [i, offset]).sort(([ai], [bi]) => ai - bi).map(([_, offset]) => offset),
-                tokenOffsets: tokens.map(({s}, offset) => [s, offset]).sort(([ai], [bi]) => ai - bi).map(([_, offset]) => offset),
+                subtokenOffsets: subtokens.map(([, {originalOffset: i}], offset) => [i, offset]).sort(([ai], [bi]) => bi - ai).map(([_, offset]) => offset),
+                tokenOffsets: tokens.map(({popularity: c}, offset) => [c, offset]).sort(([ai], [bi]) => bi - ai).map(([_, offset]) => offset),
             }
         } finally {
             const b = new Date()

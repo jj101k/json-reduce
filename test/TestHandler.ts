@@ -15,6 +15,22 @@ export class TestHandler {
         let decodedCached: string | null = null
         let encodedCached: string | null = null
         describe(`${name} driver`, () => {
+            it("can encode and decode (trivial scale)", function() {
+                const contents = `{"a-c":1,"b-c":1, "d": {"a:b/c":true}}`
+
+                let encoded = ""
+                for(const e of driver.encode(contents)) {
+                    encoded += e
+                }
+                let decoded = ""
+                for(const d of driver.decode(encoded)) {
+                    decoded += d
+                }
+                const sumi = ReferenceStats.getCanonicalSumFor(decoded)
+                const sum = ReferenceStats.getCanonicalSumFor(contents)
+
+                assert(sumi == sum, `End file ${sumi} == ${sum}`)
+            })
             it("can encode and decode (small scale)", function() {
                 const contents = ReferenceStats.getSmallContents()
 

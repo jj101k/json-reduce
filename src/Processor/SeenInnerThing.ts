@@ -2,5 +2,5 @@
  *
  */
 export interface SeenInnerThing {
-    i: number
+    originalOffset: number
 }
