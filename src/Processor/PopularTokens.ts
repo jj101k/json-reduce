@@ -1,12 +1,12 @@
 import { Chunk } from "./Chunk"
-import { SeenThing } from "./SeenThing"
+import { SeenToken } from "./SeenToken"
 
 /**
  *
  */
 export interface PopularTokens {
     chunks: Chunk[]
-    tokens: Array<SeenThing>
+    tokens: Array<SeenToken>
     lastMatchEnd: number
     subtokenBlock: string
     subtokenOffsets: number[]

@@ -1,8 +1,7 @@
 import { Chunk } from "./Chunk"
 import { MultiPass } from "./MultiPass"
 import { PopularTokens } from "./PopularTokens"
-import { PreBlock } from "./PreBlock"
-import { SeenThing } from "./SeenThing"
+import { SeenToken } from "./SeenToken"
 
 /**
  *
@@ -11,7 +10,7 @@ export class DeduplicateStringsRepass extends MultiPass {
     popularTokens(contents: string, findTokens: RegExp, findSubtokens: RegExp): PopularTokens {
         const a = new Date()
         try {
-            const tokensFound: Array<SeenThing> = []
+            const tokensFound: Array<SeenToken> = []
             const tokenFoundOffsets = new Map<string, number>()
             let currentToken = 0
 
