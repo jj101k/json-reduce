@@ -60,11 +60,10 @@ export class DeduplicateStringsRepass extends MultiPass {
             }
 
             const subtokens = [...subtokensFound.entries()]
-            const tokens = tokensFound
 
             return {
                 chunks,
-                tokens,
+                tokens: tokensFound,
                 lastMatchEnd,
                 subtokenBlock: subtokens.map(([k]) => k).join("\n"),
                 subtokenOffsets: subtokens.map((_, offset) => offset),
