@@ -1,74 +1,78 @@
 import { Chunk } from "./Chunk"
 import { MultiPass } from "./MultiPass"
 import { PopularTokens } from "./PopularTokens"
-import { PreBlock } from "./PreBlock"
-import { SeenInnerThing } from "./SeenInnerThing"
 import { SeenThing } from "./SeenThing"
 
 /**
  *
  */
 export class DeduplicateStringsSortRepass extends MultiPass {
-    popularTokens(contents: string, re: RegExp, rex: RegExp): PopularTokens {
+    popularTokens(contents: string, findTokens: RegExp, findSubtokens: RegExp): PopularTokens {
         const a = new Date()
         try {
-            const seenA: Array<SeenThing & {popularity: number}> = []
-            const seen = new Map<string, number>()
-            let i = 0
+            const tokensFound: Array<SeenThing & {popularity: number}> = []
+            const tokenFoundOffsets = new Map<string, number>()
+            let currentToken = 0
 
-            const seenL = new Map<string, SeenInnerThing & {popularity: number}>()
-            let iL = 0
+            const subtokensFound: Array<{popularity: number, token: string}> = []
+            const subtokenFoundOffsets = new Map<string, number>()
+            let currentSubtoken = 0
 
             const chunks: Chunk[] = []
             let lastMatchEnd = 0
-            let m
-            while (m = re.exec(contents)) {
-                const pre: PreBlock = {start: lastMatchEnd, finish: re.lastIndex - m[1].length}
-                lastMatchEnd = re.lastIndex
+            let tokenMatch: RegExpMatchArray | null
+            while (tokenMatch = findTokens.exec(contents)) {
+                const token = tokenMatch[1]
 
-                const subString = m[1]
-
-                let s = seen.get(subString)
-                if (s === undefined) {
-                    const chunks2: Chunk[] = []
-                    let m2
-                    let lastMatchEnd2 = 0
-                    while(m2 = rex.exec(subString)) {
-                        const pre2: PreBlock = {start: lastMatchEnd2, finish: rex.lastIndex - m2[1].length}
-                        lastMatchEnd2 = rex.lastIndex
-
-                        let s2 = seenL.get(m2[1])
-                        if(!s2) {
-                            s2 = {originalOffset: iL++, popularity: 0 }
-                            seenL.set(m2[1], s2)
+                let tokenFoundOffset = tokenFoundOffsets.get(token)
+                if (tokenFoundOffset === undefined) {
+                    const subtokenChunks: Chunk[] = []
+                    let subtokenMatch: RegExpMatchArray | null
+                    let subtokenLastMatchEnd = 0
+                    while(subtokenMatch = findSubtokens.exec(token)) {
+                        const subtoken = subtokenMatch[1]
+                        let subtokenFoundOffset = subtokenFoundOffsets.get(subtoken)
+                        if(subtokenFoundOffset === undefined) {
+                            subtokenFoundOffset = currentSubtoken++
+                            subtokenFoundOffsets.set(subtoken, subtokenFoundOffset)
+                            subtokensFound.push({popularity: 0, token: subtoken})
                         }
-                        s2.popularity++
-                        chunks2.push({pre: pre2, post: s2.originalOffset})
-                    }
-                    s = i++
+                        subtokensFound[subtokenFoundOffset].popularity++
+                        subtokenChunks.push({
+                            pre: {start: subtokenLastMatchEnd, finish: findSubtokens.lastIndex - subtoken.length},
+                            post: subtokenFoundOffset,
+                        })
 
-                    seen.set(subString, s)
-                    seenA.push({chunks: chunks2, lastMatchEnd: lastMatchEnd2, token: subString, popularity: 0})
+                        subtokenLastMatchEnd = findSubtokens.lastIndex
+                    }
+                    tokenFoundOffset = currentToken++
+
+                    tokenFoundOffsets.set(token, tokenFoundOffset)
+                    tokensFound.push({chunks: subtokenChunks, lastMatchEnd: subtokenLastMatchEnd, token: token, popularity: 0})
                 }
 
-                seenA[s].popularity++
+                tokensFound[tokenFoundOffset].popularity++
 
-                chunks.push({ pre, post: s })
+                chunks.push({
+                    pre: {start: lastMatchEnd, finish: findTokens.lastIndex - tokenMatch[1].length},
+                    post: tokenFoundOffset
+                })
+                lastMatchEnd = findTokens.lastIndex
             }
             const b = new Date()
             if (this.debug) {
                 console.warn(`Finding tokens (a) took ${b.valueOf() - a.valueOf()}ms`)
             }
 
-            const subtokens = [...seenL.entries()].sort(([_, av], [__, bv]) => bv.popularity - av.popularity)
+            const subtokens = subtokensFound.slice().sort((av, bv) => bv.popularity - av.popularity)
 
             // Build abstract popularity
             let ix = subtokens.length
-            for(const [, st] of subtokens) {
+            for(const st of subtokens) {
                 st.popularity = --ix
             }
 
-            const tokens = seenA.slice().sort((a, b) => b.popularity - a.popularity)
+            const tokens = tokensFound.slice().sort((a, b) => b.popularity - a.popularity)
 
             // Build abstract popularity
             ix = tokens.length
@@ -80,9 +84,9 @@ export class DeduplicateStringsSortRepass extends MultiPass {
                 chunks,
                 tokens,
                 lastMatchEnd,
-                subtokenBlock: subtokens.map(([k]) => k).join("\n"),
-                subtokenOffsets: [...seenL.values()].map(({popularity}) => seenL.size - popularity - 1),
-                tokenOffsets: seenA.map(({popularity}) => seenA.length - popularity - 1),
+                subtokenBlock: subtokens.map(v => v.token).join("\n"),
+                subtokenOffsets: subtokensFound.map(({popularity}) => subtokensFound.length - popularity - 1),
+                tokenOffsets: tokensFound.map(({popularity}) => tokensFound.length - popularity - 1),
             }
         } finally {
             const b = new Date()
