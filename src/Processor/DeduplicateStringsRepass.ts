@@ -8,56 +8,60 @@ import { SeenThing } from "./SeenThing"
  *
  */
 export class DeduplicateStringsRepass extends MultiPass {
-    popularTokens(contents: string, re: RegExp, rex: RegExp): PopularTokens {
+    popularTokens(contents: string, findTokens: RegExp, findSubtokens: RegExp): PopularTokens {
         const a = new Date()
         try {
-            const seenA: Array<SeenThing> = []
-            const seen = new Map<string, number>()
-            let i = 0
+            const tokensFound: Array<SeenThing> = []
+            const tokenFoundOffsets = new Map<string, number>()
+            let currentToken = 0
 
-            const seenL = new Map<string, number>()
-            let iL = 0
+            const subtokensFound = new Map<string, number>()
+            let currentSubtoken = 0
 
             const chunks: Chunk[] = []
             let lastMatchEnd = 0
-            let m
-            while (m = re.exec(contents)) {
-                const pre: PreBlock = {start: lastMatchEnd, finish: re.lastIndex - m[1].length}
-                lastMatchEnd = re.lastIndex
+            let tokenMatch: RegExpMatchArray | null
+            while (tokenMatch = findTokens.exec(contents)) {
+                const token = tokenMatch[1]
 
-                const subString = m[1]
-
-                let s = seen.get(subString)
-                if (s === undefined) {
-                    const chunks2: Chunk[] = []
-                    let m2
-                    let lastMatchEnd2 = 0
-                    while(m2 = rex.exec(subString)) {
-                        const pre2: PreBlock = {start: lastMatchEnd2, finish: rex.lastIndex - m2[1].length}
-                        lastMatchEnd2 = rex.lastIndex
-
-                        let s2 = seenL.get(m2[1])
-                        if(s2 === undefined) {
-                            s2 = iL++
-                            seenL.set(m2[1], s2)
+                let tokenFoundOffset = tokenFoundOffsets.get(token)
+                if (tokenFoundOffset === undefined) {
+                    const subtokenChunks: Chunk[] = []
+                    let subtokenMatch: RegExpMatchArray | null
+                    let subtokenLastMatchEnd = 0
+                    while(subtokenMatch = findSubtokens.exec(token)) {
+                        const subtoken = subtokenMatch[1]
+                        let subtokenFound = subtokensFound.get(subtoken)
+                        if(subtokenFound === undefined) {
+                            subtokenFound = currentSubtoken++
+                            subtokensFound.set(subtoken, subtokenFound)
                         }
-                        chunks2.push({pre: pre2, post: s2})
+                        subtokenChunks.push({
+                            pre: {start: subtokenLastMatchEnd, finish: findSubtokens.lastIndex - subtoken.length},
+                            post: subtokenFound,
+                        })
+                        subtokenLastMatchEnd = findSubtokens.lastIndex
                     }
-                    s = i++
+                    tokenFoundOffset = currentToken++
 
-                    seen.set(subString, s)
-                    seenA.push({chunks: chunks2, lastMatchEnd: lastMatchEnd2, token: subString})
+                    tokenFoundOffsets.set(token, tokenFoundOffset)
+                    tokensFound.push({chunks: subtokenChunks, lastMatchEnd: subtokenLastMatchEnd, token: token})
                 }
 
-                chunks.push({ pre, post: s })
+                chunks.push({
+                    pre: {start: lastMatchEnd, finish: findTokens.lastIndex - token.length},
+                    post: tokenFoundOffset
+                })
+
+                lastMatchEnd = findTokens.lastIndex
             }
             const b = new Date()
             if (this.debug) {
                 console.warn(`Finding tokens (a) took ${b.valueOf() - a.valueOf()}ms`)
             }
 
-            const subtokens = [...seenL.entries()]
-            const tokens = seenA
+            const subtokens = [...subtokensFound.entries()]
+            const tokens = tokensFound
 
             return {
                 chunks,
@@ -65,7 +69,7 @@ export class DeduplicateStringsRepass extends MultiPass {
                 lastMatchEnd,
                 subtokenBlock: subtokens.map(([k]) => k).join("\n"),
                 subtokenOffsets: subtokens.map((_, offset) => offset),
-                tokenOffsets: seenA.map((_, offset) => offset),
+                tokenOffsets: tokensFound.map((_, offset) => offset),
             }
         } finally {
             const b = new Date()

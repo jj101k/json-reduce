@@ -8,11 +8,11 @@ export abstract class MultiPass extends Local {
     /**
      *
      * @param contents
-     * @param re
-     * @param rex
+     * @param findTokens
+     * @param findSubtokens
      * @returns
      */
-    abstract popularTokens(contents: string, re: RegExp, rex: RegExp): PopularTokens
+    abstract popularTokens(contents: string, findTokens: RegExp, findSubtokens: RegExp): PopularTokens
 
     *encodeInner(contents: string) {
         const contentsShort = this.shortenIfNeeded(contents)
