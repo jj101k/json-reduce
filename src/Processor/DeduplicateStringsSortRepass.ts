@@ -54,7 +54,7 @@ export class DeduplicateStringsSortRepass extends MultiPass {
                 tokensFound[tokenFoundOffset].popularity++
 
                 chunks.push({
-                    pre: {start: lastMatchEnd, finish: findTokens.lastIndex - tokenMatch[1].length},
+                    pre: {start: lastMatchEnd, finish: findTokens.lastIndex - token.length},
                     post: tokenFoundOffset
                 })
                 lastMatchEnd = findTokens.lastIndex
