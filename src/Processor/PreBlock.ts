@@ -1,4 +1,4 @@
 /**
  *
  */
-export type PreBlock = [number, number]
+export type PreBlock = {start: number, finish: number}

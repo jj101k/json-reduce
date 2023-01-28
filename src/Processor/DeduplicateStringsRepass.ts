@@ -30,7 +30,7 @@ export class DeduplicateStringsRepass extends MultiPass {
             let lastMatchEnd = 0
             let m
             while (m = re.exec(contents)) {
-                const pre: PreBlock = [lastMatchEnd, re.lastIndex - m[1].length]
+                const pre: PreBlock = {start: lastMatchEnd, finish: re.lastIndex - m[1].length}
                 lastMatchEnd = re.lastIndex
 
                 const subString = m[1]
@@ -41,7 +41,7 @@ export class DeduplicateStringsRepass extends MultiPass {
                     let m2
                     let lastMatchEnd2 = 0
                     while(m2 = rex.exec(subString)) {
-                        const pre2: PreBlock = [lastMatchEnd2, rex.lastIndex - m2[1].length]
+                        const pre2: PreBlock = {start: lastMatchEnd2, finish: rex.lastIndex - m2[1].length}
                         lastMatchEnd2 = rex.lastIndex
 
                         let s2 = seenL.get(m2[1])
@@ -54,7 +54,7 @@ export class DeduplicateStringsRepass extends MultiPass {
                     s = i++
 
                     seen.set(subString, s)
-                    seenA.push({chunks: chunks2, lastMatchEnd: lastMatchEnd2, t: subString})
+                    seenA.push({chunks: chunks2, lastMatchEnd: lastMatchEnd2, token: subString})
                 }
 
                 chunks.push({ pre, post: s })
@@ -90,11 +90,11 @@ export class DeduplicateStringsRepass extends MultiPass {
         for(const t of ordered.tokens) {
             let buffer = ""
             for(const c of t.chunks) {
-                const pre = t.t.substring(c.pre[0], c.pre[1])
+                const pre = t.token.substring(c.pre.start, c.pre.finish)
                 const post = tokenRefOffsets[c.post].toString(36)
                 buffer += pre + post
             }
-            yield buffer + t.t.substring(t.lastMatchEnd, contentsShort.length) + "\n"
+            yield buffer + t.token.substring(t.lastMatchEnd, contentsShort.length) + "\n"
         }
         yield "\n\n"
 
@@ -102,7 +102,7 @@ export class DeduplicateStringsRepass extends MultiPass {
 
         let buffer = ""
         for (const t of ordered.chunks) {
-            const pre = contentsShort.substring(t.pre[0], t.pre[1])
+            const pre = contentsShort.substring(t.pre.start, t.pre.finish)
             const post = tokenRefOffsets2[t.post].toString(36)
             buffer += pre + post
             if(buffer.length > 65536) {
