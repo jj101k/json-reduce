@@ -57,11 +57,16 @@ export class DeduplicateStringsRepass extends MultiPass {
                 console.warn(`Finding tokens (a) took ${b.valueOf() - a.valueOf()}ms`)
             }
 
+            const subtokens = [...seenL.entries()]
+            const tokens = seenA
+
             return {
                 chunks,
-                tokens: seenA.map((v, i) => ({i, ...v})),
-                subtokens: [...seenL.entries()].map(([k, v]) => ({token: k, originalReference: v.i})),
+                tokens,
                 lastMatchEnd,
+                subtokenBlock: subtokens.map(([k]) => k).join("\n"),
+                subtokenOffsets: subtokens.map((_, offset) => offset),
+                tokenOffsets: seenA.map((_, offset) => offset),
             }
         } finally {
             const b = new Date()

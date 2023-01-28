@@ -1,0 +1,334 @@
+Statistical profiling result from isolate-0x120078000-60095-v8.log, (2508 ticks, 25 unaccounted, 0 excluded).
+
+ [Shared libraries]:
+   ticks  total  nonlib   name
+     43    1.7%          /usr/lib/system/libsystem_platform.dylib
+     24    1.0%          /usr/lib/system/libsystem_kernel.dylib
+     11    0.4%          /usr/lib/system/libsystem_pthread.dylib
+      4    0.2%          /usr/lib/system/libsystem_c.dylib
+      4    0.2%          /usr/lib/libc++.1.dylib
+      3    0.1%          /usr/lib/system/libsystem_malloc.dylib
+      3    0.1%          /usr/lib/system/libdyld.dylib
+
+ [JavaScript]:
+   ticks  total  nonlib   name
+     90    3.6%    3.7%  LazyCompile: *encode /Users/jimdriscoll/Documents/Development/json-reduce/dist/Processor/DeduplicateStringsRepass.js:69:19
+     57    2.3%    2.4%  LazyCompile: *popularTokens /Users/jimdriscoll/Documents/Development/json-reduce/dist/Processor/DeduplicateStringsRepass.js:6:25
+     47    1.9%    1.9%  RegExp: ("[^"\\]*(?:\\.[^"\\]*)*"|[a-z0-9]+)
+     41    1.6%    1.7%  LazyCompile: *_write node:internal/streams/writable:286:16
+     27    1.1%    1.1%  RegExp: ([a-z0-9]+)
+     25    1.0%    1.0%  LazyCompile: *fromStringFast node:buffer:422:24
+      9    0.4%    0.4%  LazyCompile: *onwrite node:internal/streams/writable:428:17
+      7    0.3%    0.3%  LazyCompile: *<anonymous> /Users/jimdriscoll/Documents/Development/json-reduce/dist/bin/deduplicate-strings-repass.js:1:1
+      5    0.2%    0.2%  LazyCompile: *getStdout node:internal/bootstrap/switches/is_main_thread:146:19
+      5    0.2%    0.2%  LazyCompile: *<anonymous> node:internal/fs/utils:657:3
+      4    0.2%    0.2%  LazyCompile: *<anonymous> node:internal/validators:94:3
+      3    0.1%    0.1%  LazyCompile: *get node:internal/bootstrap/node:421:8
+      3    0.1%    0.1%  LazyCompile: *<anonymous> /Users/jimdriscoll/Documents/Development/json-reduce/dist/Processor/DeduplicateStringsRepass.js:42:49
+      2    0.1%    0.1%  LazyCompile: *getEncodingOps node:buffer:688:24
+      2    0.1%    0.1%  LazyCompile: *afterWrite node:internal/streams/writable:490:20
+      2    0.1%    0.1%  LazyCompile: *<anonymous> node:internal/fs/utils:692:40
+      2    0.1%    0.1%  LazyCompile: *<anonymous> /Users/jimdriscoll/Documents/Development/json-reduce/dist/Processor/DeduplicateStringsRepass.js:43:51
+      1    0.0%    0.0%  LazyCompile: *<anonymous> /Users/jimdriscoll/Documents/Development/json-reduce/dist/Processor/DeduplicateStringsRepass.js:74:91
+      1    0.0%    0.0%  LazyCompile: *<anonymous> /Users/jimdriscoll/Documents/Development/json-reduce/dist/Processor/DeduplicateStringsRepass.js:73:35
+
+ [C++]:
+   ticks  total  nonlib   name
+    978   39.0%   40.5%  T node::contextify::ContextifyScript::~ContextifyScript()
+    905   36.1%   37.5%  T _proc_set_dirty
+     32    1.3%    1.3%  t void node::Buffer::(anonymous namespace)::StringSlice<(node::encoding)1>(v8::FunctionCallbackInfo<v8::Value> const&)
+     29    1.2%    1.2%  T node::builtins::BuiltinLoader::CompileFunction(v8::FunctionCallbackInfo<v8::Value> const&)
+     17    0.7%    0.7%  t void node::Buffer::(anonymous namespace)::StringWrite<(node::encoding)1>(v8::FunctionCallbackInfo<v8::Value> const&)
+     13    0.5%    0.5%  T _semaphore_create
+     12    0.5%    0.5%  T _mach_vm_purgable_control
+     10    0.4%    0.4%  t __pthread_bsdthread_init
+      9    0.4%    0.4%  t _dec
+      7    0.3%    0.3%  T _host_request_notification
+      6    0.2%    0.2%  t node::Buffer::(anonymous namespace)::ByteLengthUtf8(v8::FunctionCallbackInfo<v8::Value> const&)
+      4    0.2%    0.2%  t std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> > std::__1::__pad_and_output<char, std::__1::char_traits<char> >(std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> >, char const*, char const*, char const*, std::__1::ios_base&, char)
+      4    0.2%    0.2%  t std::__1::__hash_iterator<std::__1::__hash_node<std::__1::__hash_value_type<node::FastStringKey, node::BaseObjectPtrImpl<node::BaseObject, false> >, void*>*> std::__1::__hash_table<std::__1::__hash_value_type<node::FastStringKey, node::BaseObjectPtrImpl<node::BaseObject, false> >, std::__1::__unordered_map_hasher<node::FastStringKey, std::__1::__hash_value_type<node::FastStringKey, node::BaseObjectPtrImpl<node::BaseObject, false> >, node::FastStringKey::Hash, true>, std::__1::__unordered_map_equal<node::FastStringKey, std::__1::__hash_value_type<node::FastStringKey, node::BaseObjectPtrImpl<node::BaseObject, false> >, std::__1::equal_to<node::FastStringKey>, true>, std::__1::allocator<std::__1::__hash_value_type<node::FastStringKey, node::BaseObjectPtrImpl<node::BaseObject, false> > > >::find<node::FastStringKey>(node::FastStringKey const&)
+      4    0.2%    0.2%  t __pthread_main_thread_init
+      4    0.2%    0.2%  T _mach_port_insert_right
+      4    0.2%    0.2%  T ___pthread_init
+      3    0.1%    0.1%  T _semaphore_destroy
+      2    0.1%    0.1%  t std::__1::basic_ostream<char, std::__1::char_traits<char> >& std::__1::__put_character_sequence<char, std::__1::char_traits<char> >(std::__1::basic_ostream<char, std::__1::char_traits<char> >&, char const*, unsigned long)
+      2    0.1%    0.1%  t node::Buffer::(anonymous namespace)::CreateFromString(v8::FunctionCallbackInfo<v8::Value> const&)
+      2    0.1%    0.1%  t _hex
+      2    0.1%    0.1%  T node::contextify::ContextifyContext::CompileFunction(v8::FunctionCallbackInfo<v8::Value> const&)
+      2    0.1%    0.1%  T _guarded_open_np
+      2    0.1%    0.1%  T __simple_asl_log
+      1    0.0%    0.0%  T node::Environment::PrintSyncTrace() const
+      1    0.0%    0.0%  T node::Buffer::Length(v8::Local<v8::Object>)
+      1    0.0%    0.0%  T node::Buffer::Data(v8::Local<v8::Object>)
+      1    0.0%    0.0%  T _host_get_special_port
+      1    0.0%    0.0%  T __simple_asl_log_prog
+
+ [Summary]:
+   ticks  total  nonlib   name
+    333   13.3%   13.8%  JavaScript
+   2058   82.1%   85.2%  C++
+    184    7.3%    7.6%  GC
+     92    3.7%          Shared libraries
+     25    1.0%          Unaccounted
+
+ [C++ entry points]:
+   ticks    cpp   total   name
+    905   48.4%   36.1%  T _proc_set_dirty
+    840   44.9%   33.5%  T node::contextify::ContextifyScript::~ContextifyScript()
+     32    1.7%    1.3%  t void node::Buffer::(anonymous namespace)::StringSlice<(node::encoding)1>(v8::FunctionCallbackInfo<v8::Value> const&)
+     29    1.6%    1.2%  T node::builtins::BuiltinLoader::CompileFunction(v8::FunctionCallbackInfo<v8::Value> const&)
+     17    0.9%    0.7%  t void node::Buffer::(anonymous namespace)::StringWrite<(node::encoding)1>(v8::FunctionCallbackInfo<v8::Value> const&)
+     10    0.5%    0.4%  t __pthread_bsdthread_init
+      6    0.3%    0.2%  t node::Buffer::(anonymous namespace)::ByteLengthUtf8(v8::FunctionCallbackInfo<v8::Value> const&)
+      4    0.2%    0.2%  t std::__1::__hash_iterator<std::__1::__hash_node<std::__1::__hash_value_type<node::FastStringKey, node::BaseObjectPtrImpl<node::BaseObject, false> >, void*>*> std::__1::__hash_table<std::__1::__hash_value_type<node::FastStringKey, node::BaseObjectPtrImpl<node::BaseObject, false> >, std::__1::__unordered_map_hasher<node::FastStringKey, std::__1::__hash_value_type<node::FastStringKey, node::BaseObjectPtrImpl<node::BaseObject, false> >, node::FastStringKey::Hash, true>, std::__1::__unordered_map_equal<node::FastStringKey, std::__1::__hash_value_type<node::FastStringKey, node::BaseObjectPtrImpl<node::BaseObject, false> >, std::__1::equal_to<node::FastStringKey>, true>, std::__1::allocator<std::__1::__hash_value_type<node::FastStringKey, node::BaseObjectPtrImpl<node::BaseObject, false> > > >::find<node::FastStringKey>(node::FastStringKey const&)
+      4    0.2%    0.2%  t _dec
+      3    0.2%    0.1%  t std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> > std::__1::__pad_and_output<char, std::__1::char_traits<char> >(std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> >, char const*, char const*, char const*, std::__1::ios_base&, char)
+      3    0.2%    0.1%  t __pthread_main_thread_init
+      3    0.2%    0.1%  T ___pthread_init
+      2    0.1%    0.1%  t std::__1::basic_ostream<char, std::__1::char_traits<char> >& std::__1::__put_character_sequence<char, std::__1::char_traits<char> >(std::__1::basic_ostream<char, std::__1::char_traits<char> >&, char const*, unsigned long)
+      2    0.1%    0.1%  t node::Buffer::(anonymous namespace)::CreateFromString(v8::FunctionCallbackInfo<v8::Value> const&)
+      2    0.1%    0.1%  T node::contextify::ContextifyContext::CompileFunction(v8::FunctionCallbackInfo<v8::Value> const&)
+      2    0.1%    0.1%  T __simple_asl_log
+      1    0.1%    0.0%  T node::Environment::PrintSyncTrace() const
+      1    0.1%    0.0%  T node::Buffer::Length(v8::Local<v8::Object>)
+      1    0.1%    0.0%  T node::Buffer::Data(v8::Local<v8::Object>)
+      1    0.1%    0.0%  T _mach_vm_purgable_control
+      1    0.1%    0.0%  T _host_request_notification
+      1    0.1%    0.0%  T __simple_asl_log_prog
+
+ [Bottom up (heavy) profile]:
+  Note: percentage shows a share of a particular caller in the total
+  amount of its parent calls.
+  Callers occupying less than 1.0% are not shown.
+
+   ticks parent  name
+    978   39.0%  T node::contextify::ContextifyScript::~ContextifyScript()
+    201   20.6%    LazyCompile: *popularTokens /Users/jimdriscoll/Documents/Development/json-reduce/dist/Processor/DeduplicateStringsRepass.js:6:25
+    201  100.0%      LazyCompile: ~encode /Users/jimdriscoll/Documents/Development/json-reduce/dist/Processor/DeduplicateStringsRepass.js:69:19
+    201  100.0%        T node::contextify::ContextifyScript::~ContextifyScript()
+    201  100.0%          Function: ~<anonymous> /Users/jimdriscoll/Documents/Development/json-reduce/dist/bin/deduplicate-strings-repass.js:1:1
+    201  100.0%            LazyCompile: ~Module._compile node:internal/modules/cjs/loader:1173:37
+    154   15.7%    LazyCompile: *_write node:internal/streams/writable:286:16
+    152   98.7%      LazyCompile: *<anonymous> /Users/jimdriscoll/Documents/Development/json-reduce/dist/bin/deduplicate-strings-repass.js:1:1
+    152  100.0%        LazyCompile: ~Module._compile node:internal/modules/cjs/loader:1173:37
+    152  100.0%          LazyCompile: ~Module._extensions..js node:internal/modules/cjs/loader:1227:37
+    152  100.0%            LazyCompile: ~Module.load node:internal/modules/cjs/loader:1069:33
+      2    1.3%      LazyCompile: *Writable.write node:internal/streams/writable:336:36
+      2  100.0%        Function: ^<anonymous> /Users/jimdriscoll/Documents/Development/json-reduce/dist/bin/deduplicate-strings-repass.js:1:1
+      2  100.0%          LazyCompile: ~Module._compile node:internal/modules/cjs/loader:1173:37
+      2  100.0%            LazyCompile: ~Module._extensions..js node:internal/modules/cjs/loader:1227:37
+    137   14.0%    LazyCompile: *fromStringFast node:buffer:422:24
+    137  100.0%      LazyCompile: *_write node:internal/streams/writable:286:16
+    136   99.3%        LazyCompile: *<anonymous> /Users/jimdriscoll/Documents/Development/json-reduce/dist/bin/deduplicate-strings-repass.js:1:1
+    136  100.0%          LazyCompile: ~Module._compile node:internal/modules/cjs/loader:1173:37
+    136  100.0%            LazyCompile: ~Module._extensions..js node:internal/modules/cjs/loader:1227:37
+     95    9.7%    T node::contextify::ContextifyScript::~ContextifyScript()
+     46   48.4%      LazyCompile: *popularTokens /Users/jimdriscoll/Documents/Development/json-reduce/dist/Processor/DeduplicateStringsRepass.js:6:25
+     46  100.0%        LazyCompile: ~encode /Users/jimdriscoll/Documents/Development/json-reduce/dist/Processor/DeduplicateStringsRepass.js:69:19
+     46  100.0%          T node::contextify::ContextifyScript::~ContextifyScript()
+     46  100.0%            Function: ~<anonymous> /Users/jimdriscoll/Documents/Development/json-reduce/dist/bin/deduplicate-strings-repass.js:1:1
+     27   28.4%      LazyCompile: *<anonymous> /Users/jimdriscoll/Documents/Development/json-reduce/dist/bin/deduplicate-strings-repass.js:1:1
+     27  100.0%        LazyCompile: ~Module._compile node:internal/modules/cjs/loader:1173:37
+     27  100.0%          LazyCompile: ~Module._extensions..js node:internal/modules/cjs/loader:1227:37
+     27  100.0%            LazyCompile: ~Module.load node:internal/modules/cjs/loader:1069:33
+      8    8.4%      LazyCompile: ~encode /Users/jimdriscoll/Documents/Development/json-reduce/dist/Processor/DeduplicateStringsRepass.js:69:19
+      8  100.0%        T node::contextify::ContextifyScript::~ContextifyScript()
+      8  100.0%          Function: ~<anonymous> /Users/jimdriscoll/Documents/Development/json-reduce/dist/bin/deduplicate-strings-repass.js:1:1
+      8  100.0%            LazyCompile: ~Module._compile node:internal/modules/cjs/loader:1173:37
+      4    4.2%      Function: ^encode /Users/jimdriscoll/Documents/Development/json-reduce/dist/Processor/DeduplicateStringsRepass.js:69:19
+      4  100.0%        T node::contextify::ContextifyScript::~ContextifyScript()
+      4  100.0%          LazyCompile: *<anonymous> /Users/jimdriscoll/Documents/Development/json-reduce/dist/bin/deduplicate-strings-repass.js:1:1
+      4  100.0%            LazyCompile: ~Module._compile node:internal/modules/cjs/loader:1173:37
+      2    2.1%      Function: ^popularTokens /Users/jimdriscoll/Documents/Development/json-reduce/dist/Processor/DeduplicateStringsRepass.js:6:25
+      2  100.0%        LazyCompile: ~encode /Users/jimdriscoll/Documents/Development/json-reduce/dist/Processor/DeduplicateStringsRepass.js:69:19
+      2  100.0%          T node::contextify::ContextifyScript::~ContextifyScript()
+      2  100.0%            Function: ~<anonymous> /Users/jimdriscoll/Documents/Development/json-reduce/dist/bin/deduplicate-strings-repass.js:1:1
+      2    2.1%      Function: ^<anonymous> /Users/jimdriscoll/Documents/Development/json-reduce/dist/bin/deduplicate-strings-repass.js:1:1
+      2  100.0%        LazyCompile: ~Module._compile node:internal/modules/cjs/loader:1173:37
+      2  100.0%          LazyCompile: ~Module._extensions..js node:internal/modules/cjs/loader:1227:37
+      2  100.0%            LazyCompile: ~Module.load node:internal/modules/cjs/loader:1069:33
+      1    1.1%      T node::contextify::ContextifyScript::~ContextifyScript()
+      1  100.0%        LazyCompile: *popularTokens /Users/jimdriscoll/Documents/Development/json-reduce/dist/Processor/DeduplicateStringsRepass.js:6:25
+      1  100.0%          LazyCompile: ~encode /Users/jimdriscoll/Documents/Development/json-reduce/dist/Processor/DeduplicateStringsRepass.js:69:19
+      1  100.0%            T node::contextify::ContextifyScript::~ContextifyScript()
+      1    1.1%      LazyCompile: ~resolvePackageTargetString node:internal/modules/esm/resolve:412:36
+      1  100.0%        LazyCompile: ~resolvePackageTarget node:internal/modules/esm/resolve:519:30
+      1  100.0%          LazyCompile: ~resolvePackageTarget node:internal/modules/esm/resolve:519:30
+      1  100.0%            LazyCompile: ~packageExportsResolve node:internal/modules/esm/resolve:625:31
+      1    1.1%      LazyCompile: ~normalizeString node:path:66:25
+      1  100.0%        LazyCompile: ~resolve node:path:1091:10
+      1  100.0%          LazyCompile: ~patchProcessObject node:internal/process/pre_execution:134:28
+      1  100.0%            LazyCompile: ~prepareExecution node:internal/process/pre_execution:51:26
+      1    1.1%      Function: ~<anonymous> node:internal/main/run_main_module:1:1
+      1    1.1%      Function: ^<anonymous> node:internal/modules/cjs/loader:1:1
+      1  100.0%        Function: ^requireBuiltin node:internal/bootstrap/loaders:356:24
+      1  100.0%          LazyCompile: ~initializeCJSLoader node:internal/process/pre_execution:557:29
+      1  100.0%            LazyCompile: ~setupUserModules node:internal/process/pre_execution:120:26
+      1    1.1%      Function: ^<anonymous> /Users/jimdriscoll/Documents/Development/json-reduce/dist/Processor/DeduplicateStringsRepass.js:84:53
+      1  100.0%        T node::contextify::ContextifyScript::~ContextifyScript()
+      1  100.0%          Function: ^encode /Users/jimdriscoll/Documents/Development/json-reduce/dist/Processor/DeduplicateStringsRepass.js:69:19
+      1  100.0%            T node::contextify::ContextifyScript::~ContextifyScript()
+     84    8.6%    LazyCompile: *encode /Users/jimdriscoll/Documents/Development/json-reduce/dist/Processor/DeduplicateStringsRepass.js:69:19
+     84  100.0%      T node::contextify::ContextifyScript::~ContextifyScript()
+     82   97.6%        LazyCompile: *<anonymous> /Users/jimdriscoll/Documents/Development/json-reduce/dist/bin/deduplicate-strings-repass.js:1:1
+     82  100.0%          LazyCompile: ~Module._compile node:internal/modules/cjs/loader:1173:37
+     82  100.0%            LazyCompile: ~Module._extensions..js node:internal/modules/cjs/loader:1227:37
+      2    2.4%        Function: ^<anonymous> /Users/jimdriscoll/Documents/Development/json-reduce/dist/bin/deduplicate-strings-repass.js:1:1
+      2  100.0%          LazyCompile: ~Module._compile node:internal/modules/cjs/loader:1173:37
+      2  100.0%            LazyCompile: ~Module._extensions..js node:internal/modules/cjs/loader:1227:37
+     64    6.5%    LazyCompile: *<anonymous> /Users/jimdriscoll/Documents/Development/json-reduce/dist/bin/deduplicate-strings-repass.js:1:1
+     64  100.0%      LazyCompile: ~Module._compile node:internal/modules/cjs/loader:1173:37
+     64  100.0%        LazyCompile: ~Module._extensions..js node:internal/modules/cjs/loader:1227:37
+     64  100.0%          LazyCompile: ~Module.load node:internal/modules/cjs/loader:1069:33
+     64  100.0%            LazyCompile: ~Module._load node:internal/modules/cjs/loader:851:24
+     33    3.4%    Function: ^popularTokens /Users/jimdriscoll/Documents/Development/json-reduce/dist/Processor/DeduplicateStringsRepass.js:6:25
+     33  100.0%      LazyCompile: ~encode /Users/jimdriscoll/Documents/Development/json-reduce/dist/Processor/DeduplicateStringsRepass.js:69:19
+     33  100.0%        T node::contextify::ContextifyScript::~ContextifyScript()
+     33  100.0%          Function: ~<anonymous> /Users/jimdriscoll/Documents/Development/json-reduce/dist/bin/deduplicate-strings-repass.js:1:1
+     33  100.0%            LazyCompile: ~Module._compile node:internal/modules/cjs/loader:1173:37
+     23    2.4%    LazyCompile: ~Module._compile node:internal/modules/cjs/loader:1173:37
+     23  100.0%      LazyCompile: ~Module._extensions..js node:internal/modules/cjs/loader:1227:37
+     23  100.0%        LazyCompile: ~Module.load node:internal/modules/cjs/loader:1069:33
+     23  100.0%          LazyCompile: ~Module._load node:internal/modules/cjs/loader:851:24
+     23  100.0%            LazyCompile: ~executeUserEntryPoint node:internal/modules/run_main:74:31
+
+    905   36.1%  T _proc_set_dirty
+    905  100.0%    LazyCompile: *_write node:internal/streams/writable:286:16
+    898   99.2%      LazyCompile: *<anonymous> /Users/jimdriscoll/Documents/Development/json-reduce/dist/bin/deduplicate-strings-repass.js:1:1
+    898  100.0%        LazyCompile: ~Module._compile node:internal/modules/cjs/loader:1173:37
+    898  100.0%          LazyCompile: ~Module._extensions..js node:internal/modules/cjs/loader:1227:37
+    898  100.0%            LazyCompile: ~Module.load node:internal/modules/cjs/loader:1069:33
+
+     90    3.6%  LazyCompile: *encode /Users/jimdriscoll/Documents/Development/json-reduce/dist/Processor/DeduplicateStringsRepass.js:69:19
+     88   97.8%    T node::contextify::ContextifyScript::~ContextifyScript()
+     88  100.0%      LazyCompile: *<anonymous> /Users/jimdriscoll/Documents/Development/json-reduce/dist/bin/deduplicate-strings-repass.js:1:1
+     88  100.0%        LazyCompile: ~Module._compile node:internal/modules/cjs/loader:1173:37
+     88  100.0%          LazyCompile: ~Module._extensions..js node:internal/modules/cjs/loader:1227:37
+     88  100.0%            LazyCompile: ~Module.load node:internal/modules/cjs/loader:1069:33
+      2    2.2%    LazyCompile: *<anonymous> /Users/jimdriscoll/Documents/Development/json-reduce/dist/bin/deduplicate-strings-repass.js:1:1
+      2  100.0%      LazyCompile: ~Module._compile node:internal/modules/cjs/loader:1173:37
+      2  100.0%        LazyCompile: ~Module._extensions..js node:internal/modules/cjs/loader:1227:37
+      2  100.0%          LazyCompile: ~Module.load node:internal/modules/cjs/loader:1069:33
+      2  100.0%            LazyCompile: ~Module._load node:internal/modules/cjs/loader:851:24
+
+     57    2.3%  LazyCompile: *popularTokens /Users/jimdriscoll/Documents/Development/json-reduce/dist/Processor/DeduplicateStringsRepass.js:6:25
+     57  100.0%    LazyCompile: ~encode /Users/jimdriscoll/Documents/Development/json-reduce/dist/Processor/DeduplicateStringsRepass.js:69:19
+     57  100.0%      T node::contextify::ContextifyScript::~ContextifyScript()
+     57  100.0%        Function: ~<anonymous> /Users/jimdriscoll/Documents/Development/json-reduce/dist/bin/deduplicate-strings-repass.js:1:1
+     57  100.0%          LazyCompile: ~Module._compile node:internal/modules/cjs/loader:1173:37
+     57  100.0%            LazyCompile: ~Module._extensions..js node:internal/modules/cjs/loader:1227:37
+
+     47    1.9%  RegExp: ("[^"\\]*(?:\\.[^"\\]*)*"|[a-z0-9]+)
+     47  100.0%    T node::contextify::ContextifyScript::~ContextifyScript()
+     47  100.0%      LazyCompile: *popularTokens /Users/jimdriscoll/Documents/Development/json-reduce/dist/Processor/DeduplicateStringsRepass.js:6:25
+     47  100.0%        LazyCompile: ~encode /Users/jimdriscoll/Documents/Development/json-reduce/dist/Processor/DeduplicateStringsRepass.js:69:19
+     47  100.0%          T node::contextify::ContextifyScript::~ContextifyScript()
+     47  100.0%            Function: ~<anonymous> /Users/jimdriscoll/Documents/Development/json-reduce/dist/bin/deduplicate-strings-repass.js:1:1
+
+     43    1.7%  /usr/lib/system/libsystem_platform.dylib
+     37   86.0%    LazyCompile: *_write node:internal/streams/writable:286:16
+     37  100.0%      LazyCompile: *<anonymous> /Users/jimdriscoll/Documents/Development/json-reduce/dist/bin/deduplicate-strings-repass.js:1:1
+     37  100.0%        LazyCompile: ~Module._compile node:internal/modules/cjs/loader:1173:37
+     37  100.0%          LazyCompile: ~Module._extensions..js node:internal/modules/cjs/loader:1227:37
+     37  100.0%            LazyCompile: ~Module.load node:internal/modules/cjs/loader:1069:33
+      6   14.0%    LazyCompile: *popularTokens /Users/jimdriscoll/Documents/Development/json-reduce/dist/Processor/DeduplicateStringsRepass.js:6:25
+      6  100.0%      LazyCompile: ~encode /Users/jimdriscoll/Documents/Development/json-reduce/dist/Processor/DeduplicateStringsRepass.js:69:19
+      6  100.0%        T node::contextify::ContextifyScript::~ContextifyScript()
+      6  100.0%          Function: ~<anonymous> /Users/jimdriscoll/Documents/Development/json-reduce/dist/bin/deduplicate-strings-repass.js:1:1
+      6  100.0%            LazyCompile: ~Module._compile node:internal/modules/cjs/loader:1173:37
+
+     41    1.6%  LazyCompile: *_write node:internal/streams/writable:286:16
+     41  100.0%    LazyCompile: *<anonymous> /Users/jimdriscoll/Documents/Development/json-reduce/dist/bin/deduplicate-strings-repass.js:1:1
+     41  100.0%      LazyCompile: ~Module._compile node:internal/modules/cjs/loader:1173:37
+     41  100.0%        LazyCompile: ~Module._extensions..js node:internal/modules/cjs/loader:1227:37
+     41  100.0%          LazyCompile: ~Module.load node:internal/modules/cjs/loader:1069:33
+     41  100.0%            LazyCompile: ~Module._load node:internal/modules/cjs/loader:851:24
+
+     32    1.3%  t void node::Buffer::(anonymous namespace)::StringSlice<(node::encoding)1>(v8::FunctionCallbackInfo<v8::Value> const&)
+     32  100.0%    LazyCompile: ~slice node:buffer:603:12
+     32  100.0%      LazyCompile: ~toString node:buffer:793:46
+     32  100.0%        LazyCompile: ~readFileSync node:fs:465:22
+     32  100.0%          Function: ~<anonymous> /Users/jimdriscoll/Documents/Development/json-reduce/dist/bin/deduplicate-strings-repass.js:1:1
+     32  100.0%            LazyCompile: ~Module._compile node:internal/modules/cjs/loader:1173:37
+
+     29    1.2%  T node::builtins::BuiltinLoader::CompileFunction(v8::FunctionCallbackInfo<v8::Value> const&)
+     24   82.8%    Function: ^requireBuiltin node:internal/bootstrap/loaders:356:24
+      3   12.5%      Function: ~<anonymous> node:internal/modules/esm/loader:1:1
+      3  100.0%        Function: ^requireBuiltin node:internal/bootstrap/loaders:356:24
+      3  100.0%          Function: ~<anonymous> node:internal/process/esm_loader:1:1
+      3  100.0%            Function: ^requireBuiltin node:internal/bootstrap/loaders:356:24
+      3   12.5%      Function: ~<anonymous> node:internal/modules/esm/fetch_module:1:1
+      3  100.0%        Function: ^requireBuiltin node:internal/bootstrap/loaders:356:24
+      3  100.0%          Function: ~<anonymous> node:internal/modules/esm/get_format:1:1
+      3  100.0%            Function: ^requireBuiltin node:internal/bootstrap/loaders:356:24
+      3   12.5%      Function: ~<anonymous> node:internal/fs/promises:1:1
+      3  100.0%        Function: ^requireBuiltin node:internal/bootstrap/loaders:356:24
+      3  100.0%          Function: ~<anonymous> node:internal/modules/esm/load:1:1
+      3  100.0%            Function: ^requireBuiltin node:internal/bootstrap/loaders:356:24
+      2    8.3%      LazyCompile: ~initializeCJSLoader node:internal/process/pre_execution:557:29
+      2  100.0%        LazyCompile: ~setupUserModules node:internal/process/pre_execution:120:26
+      2  100.0%          LazyCompile: ~prepareExecution node:internal/process/pre_execution:51:26
+      2  100.0%            LazyCompile: ~prepareMainThreadExecution node:internal/process/pre_execution:35:36
+      2    8.3%      Function: ~<anonymous> node:internal/process/esm_loader:1:1
+      2  100.0%        Function: ^requireBuiltin node:internal/bootstrap/loaders:356:24
+      2  100.0%          Function: ~<anonymous> node:internal/modules/cjs/loader:1:1
+      2  100.0%            Function: ^requireBuiltin node:internal/bootstrap/loaders:356:24
+      2    8.3%      Function: ~<anonymous> node:internal/modules/esm/get_format:1:1
+      2  100.0%        Function: ^requireBuiltin node:internal/bootstrap/loaders:356:24
+      2  100.0%          Function: ~<anonymous> node:internal/modules/esm/resolve:1:1
+      2  100.0%            Function: ^requireBuiltin node:internal/bootstrap/loaders:356:24
+      1    4.2%      LazyCompile: ~setupInspectorHooks node:internal/process/pre_execution:393:29
+      1  100.0%        LazyCompile: ~prepareExecution node:internal/process/pre_execution:51:26
+      1  100.0%          LazyCompile: ~prepareMainThreadExecution node:internal/process/pre_execution:35:36
+      1  100.0%            Function: ~<anonymous> node:internal/main/run_main_module:1:1
+      1    4.2%      LazyCompile: ~setupFetch node:internal/process/pre_execution:220:20
+      1  100.0%        LazyCompile: ~prepareExecution node:internal/process/pre_execution:51:26
+      1  100.0%          LazyCompile: ~prepareMainThreadExecution node:internal/process/pre_execution:35:36
+      1  100.0%            Function: ~<anonymous> node:internal/main/run_main_module:1:1
+      1    4.2%      LazyCompile: ~prepareExecution node:internal/process/pre_execution:51:26
+      1  100.0%        LazyCompile: ~prepareMainThreadExecution node:internal/process/pre_execution:35:36
+      1  100.0%          Function: ~<anonymous> node:internal/main/run_main_module:1:1
+      1    4.2%      LazyCompile: ~initializeSourceMapsHandlers node:internal/process/pre_execution:596:38
+      1  100.0%        LazyCompile: ~prepareExecution node:internal/process/pre_execution:51:26
+      1  100.0%          LazyCompile: ~prepareMainThreadExecution node:internal/process/pre_execution:35:36
+      1  100.0%            Function: ~<anonymous> node:internal/main/run_main_module:1:1
+      1    4.2%      Function: ~<anonymous> node:internal/source_map/source_map_cache:1:1
+      1  100.0%        Function: ^requireBuiltin node:internal/bootstrap/loaders:356:24
+      1  100.0%          LazyCompile: ~initializeSourceMapsHandlers node:internal/process/pre_execution:596:38
+      1  100.0%            LazyCompile: ~prepareExecution node:internal/process/pre_execution:51:26
+      1    4.2%      Function: ~<anonymous> node:internal/readline/interface:1:1
+      1  100.0%        Function: ^requireBuiltin node:internal/bootstrap/loaders:356:24
+      1  100.0%          Function: ~<anonymous> node:internal/fs/promises:1:1
+      1  100.0%            Function: ^requireBuiltin node:internal/bootstrap/loaders:356:24
+      1    4.2%      Function: ~<anonymous> node:internal/modules/esm/module_map:1:1
+      1  100.0%        Function: ^requireBuiltin node:internal/bootstrap/loaders:356:24
+      1  100.0%          Function: ~<anonymous> node:internal/modules/esm/loader:1:1
+      1  100.0%            Function: ^requireBuiltin node:internal/bootstrap/loaders:356:24
+      1    4.2%      Function: ~<anonymous> node:internal/modules/esm/load:1:1
+      1  100.0%        Function: ^requireBuiltin node:internal/bootstrap/loaders:356:24
+      1  100.0%          Function: ~<anonymous> node:internal/modules/esm/loader:1:1
+      1  100.0%            Function: ^requireBuiltin node:internal/bootstrap/loaders:356:24
+      1    4.2%      Function: ~<anonymous> node:internal/blocklist:1:1
+      1  100.0%        Function: ^requireBuiltin node:internal/bootstrap/loaders:356:24
+      1  100.0%          LazyCompile: ~get BlockList node:net:2228:16
+      1  100.0%            Function: ~<anonymous> node:internal/modules/esm/fetch_module:1:1
+      3   10.3%    Function: ^compileForInternalLoader node:internal/bootstrap/loaders:319:27
+      3  100.0%      Function: ^requireBuiltin node:internal/bootstrap/loaders:356:24
+      1   33.3%        LazyCompile: ~lazyLoadStreams node:fs:2907:25
+      1  100.0%          LazyCompile: ~get ReadStream node:fs:3050:17
+      1  100.0%            T node::contextify::ContextifyScript::~ContextifyScript()
+      1   33.3%        LazyCompile: ~createWritableStdioStream node:internal/bootstrap/switches/is_main_thread:45:35
+      1  100.0%          LazyCompile: ~getStderr node:internal/bootstrap/switches/is_main_thread:168:19
+      1  100.0%            LazyCompile: ~get node:internal/console/constructor:219:14
+      1   33.3%        Function: ~<anonymous> node:tty:1:1
+      1  100.0%          Function: ^compileForInternalLoader node:internal/bootstrap/loaders:319:27
+      1  100.0%            Function: ^requireBuiltin node:internal/bootstrap/loaders:356:24
+      2    6.9%    Function: ~<anonymous> node:internal/main/run_main_module:1:1
+
+     27    1.1%  RegExp: ([a-z0-9]+)
+     27  100.0%    T node::contextify::ContextifyScript::~ContextifyScript()
+     27  100.0%      LazyCompile: *popularTokens /Users/jimdriscoll/Documents/Development/json-reduce/dist/Processor/DeduplicateStringsRepass.js:6:25
+     27  100.0%        LazyCompile: ~encode /Users/jimdriscoll/Documents/Development/json-reduce/dist/Processor/DeduplicateStringsRepass.js:69:19
+     27  100.0%          T node::contextify::ContextifyScript::~ContextifyScript()
+     27  100.0%            Function: ~<anonymous> /Users/jimdriscoll/Documents/Development/json-reduce/dist/bin/deduplicate-strings-repass.js:1:1
+

@@ -16,30 +16,29 @@ export abstract class MultiPass extends Local {
 
     *encodeInner(contents: string) {
         const contentsShort = this.shortenIfNeeded(contents)
-        const stringMatch = /("[^"\\]*(?:\\.[^"\\]*)*"|[a-z0-9]+)/g
-        const ordered = this.popularTokens(contentsShort, stringMatch, /([a-z0-9]+)/gi)
 
-        yield ordered.subtokens.map(({token}) => token).join("\n") + "\n\n"
+        // Quoted strings, or barewords like "true", or numbers
+        const symbolMatch = /("[^"\\]*(?:\\.[^"\\]*)*"|[a-z0-9]+)/g
+        const subtokenMatch = /([a-zA-Z0-9]+)/g
+        const popularTokens = this.popularTokens(contentsShort, symbolMatch, subtokenMatch)
 
-        const tokenRefOffsets = ordered.subtokens.map(({originalReference}, offset) => [originalReference, offset]).sort(([ai], [bi]) => ai - bi).map(([_, offset]) => offset)
+        yield popularTokens.subtokenBlock + "\n\n"
 
-        for(const t of ordered.tokens) {
+        for(const t of popularTokens.tokens) {
             let buffer = ""
             for(const c of t.chunks) {
                 const pre = t.token.substring(c.pre.start, c.pre.finish)
-                const post = tokenRefOffsets[c.post].toString(36)
+                const post = popularTokens.subtokenOffsets[c.post].toString(36)
                 buffer += pre + post
             }
             yield buffer + t.token.substring(t.lastMatchEnd, contentsShort.length) + "\n"
         }
         yield "\n\n"
 
-        const tokenRefOffsets2 = ordered.tokens.map(({i}, offset) => [i, offset]).sort(([ai], [bi]) => ai - bi).map(([_, offset]) => offset)
-
         let buffer = ""
-        for (const t of ordered.chunks) {
+        for (const t of popularTokens.chunks) {
             const pre = contentsShort.substring(t.pre.start, t.pre.finish)
-            const post = tokenRefOffsets2[t.post].toString(36)
+            const post = popularTokens.tokenOffsets[t.post].toString(36)
             buffer += pre + post
             if(buffer.length > 65536) {
                 yield buffer
@@ -49,7 +48,7 @@ export abstract class MultiPass extends Local {
         if(buffer.length > 0) {
             yield buffer
         }
-        return contentsShort.substring(ordered.lastMatchEnd)
+        return contentsShort.substring(popularTokens.lastMatchEnd)
     }
 
     /**
