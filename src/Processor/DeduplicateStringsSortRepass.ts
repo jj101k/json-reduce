@@ -60,11 +60,17 @@ export class DeduplicateStringsSortRepass extends MultiPass {
                 console.warn(`Finding tokens (a) took ${b.valueOf() - a.valueOf()}ms`)
             }
 
+            const subtokens = [...seenL.entries()].sort(([_, av], [__, bv]) => bv.c - av.c)
+
+            const tokens = seenA.sort((a, b) => b.c - a.c)
+
             return {
                 chunks,
-                tokens: seenA.sort((a, b) => b.c - a.c).map(v => ({i: v.s, ...v})),
-                subtokens: [...seenL.entries()].sort(([ak, av], [bk, bv]) => bv.c - av.c).map(([k, v]) => ({token: k, originalReference: v.i})),
+                tokens,
                 lastMatchEnd,
+                subtokenBlock: subtokens.map(([k]) => k).join("\n"),
+                subtokenOffsets: subtokens.map(([, {i}], offset) => [i, offset]).sort(([ai], [bi]) => ai - bi).map(([_, offset]) => offset),
+                tokenOffsets: tokens.map(({s}, offset) => [s, offset]).sort(([ai], [bi]) => ai - bi).map(([_, offset]) => offset),
             }
         } finally {
             const b = new Date()
