@@ -69,7 +69,7 @@ export abstract class MultiPass extends Local {
         yield body.substring(lastMatchEnd, body.length)
     }
 
-    *decode(contents: string) {
+    decode(contents: string) {
         const [header1, header2, body] = contents.split(/\n\n/)
         const strings1 = header1.split("\n")
 
@@ -80,6 +80,6 @@ export abstract class MultiPass extends Local {
 
         const strings = stringsI.split("\n")
 
-        yield *this.replaceSymbolsOut(body, strings)
+        return this.replaceSymbolsOut(body, strings)
     }
 }
