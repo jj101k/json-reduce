@@ -35,7 +35,19 @@ export abstract class Local {
      *
      * @param contents
      */
-    abstract decode(contents: string): Generator<string, void>
+    *decode(contents: string) {
+        let offset = 0
+        do {
+            contents = contents.substring(offset)
+            offset = yield *this.decodeBlock(contents)
+        } while(offset < contents.length)
+    }
+
+    /**
+     *
+     * @param contents
+     */
+    abstract decodeBlock(contents: string): Generator<string, number>
 
     /**
      *
