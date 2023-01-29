@@ -34,6 +34,21 @@ export abstract class Local {
     /**
      *
      * @param contents
+     */
+    abstract decode(contents: string): Generator<string, void>
+
+    /**
+     *
+     * @param contents
+     */
+    *encode(contents: string) {
+        const endChunk = yield *this.encodeInner(contents)
+        yield endChunk
+    }
+
+    /**
+     *
+     * @param contents
      * @param uid
      */
     *encodeBlock(contents: string, uid: string) {
@@ -45,13 +60,9 @@ export abstract class Local {
 
     /**
      *
-     * @param contents
+     * @param uid
+     * @returns
      */
-    *encode(contents: string) {
-        const endChunk = yield *this.encodeInner(contents)
-        yield endChunk
-    }
-
     encodeFinish(uid: string) {
         const lastChunk = this.lastChunk
         if(lastChunk?.uid != uid) {
