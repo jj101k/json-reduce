@@ -92,6 +92,6 @@ export abstract class MultiPass extends Local {
 
         yield *this.replaceSymbolsOut(body, tokens)
 
-        return subtokenBlock.length + 2 + tokenBlockIn.length + 2 + body.length
+        return subtokenBlock.length + 2 + tokenBlockIn.length + 2 + body.length + 2
     }
 }
