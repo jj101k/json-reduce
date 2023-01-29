@@ -39,9 +39,10 @@ export abstract class SinglePass extends Local {
         yield body.substring(lastMatchEnd, body.length)
     }
 
-    *decode(contents: string) {
-        const [header, body] = contents.split(/\n\n/)
+    *decodeBlock(contents: string) {
+        const [header, body] = contents.split("\n\n", 2)
         const strings = header.split("\n")
         yield *this.replaceSymbolsOut(body, strings)
+        return header.length + 2 + body.length
     }
 }

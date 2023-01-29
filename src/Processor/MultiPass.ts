@@ -79,8 +79,8 @@ export abstract class MultiPass extends Local {
         return contentsShort.substring(popularTokens.lastMatchEnd)
     }
 
-    decode(contents: string) {
-        const [subtokenBlock, tokenBlockIn, body] = contents.split(/\n\n/)
+    *decodeBlock(contents: string) {
+        const [subtokenBlock, tokenBlockIn, body] = contents.split("\n\n", 3)
         const subtokens = subtokenBlock.split("\n")
 
         let tokenBlock = ""
@@ -90,6 +90,8 @@ export abstract class MultiPass extends Local {
 
         const tokens = tokenBlock.split("\n")
 
-        return this.replaceSymbolsOut(body, tokens)
+        yield *this.replaceSymbolsOut(body, tokens)
+
+        return subtokenBlock.length + 2 + tokenBlockIn.length + 2 + body.length
     }
 }
