@@ -30,6 +30,10 @@ export abstract class MultiPass extends Local {
                 const pre = t.token.substring(c.pre.start, c.pre.finish)
                 const post = popularTokens.subtokenOffsets[c.post].toString(36)
                 buffer += pre + post
+                if(buffer.length > 65536) {
+                    yield buffer
+                    buffer = ""
+                }
             }
             yield buffer + t.token.substring(t.lastMatchEnd, contentsShort.length) + "\n"
         }
