@@ -7,6 +7,30 @@ import { PopularTokens } from "./PopularTokens"
 export abstract class MultiPass extends Local {
     /**
      *
+     * @param body
+     * @param strings
+     */
+    private *replaceSymbolsOut(body: string, strings: string[]) {
+        let m
+        let lastMatchEnd = 0
+        const base36Match = /([a-z0-9]+)/g
+        let buffer = ""
+        while (m = base36Match.exec(body)) {
+            const pre = body.substring(lastMatchEnd, base36Match.lastIndex - m[1].length)
+            lastMatchEnd = base36Match.lastIndex
+            const post = strings[parseInt(m[1], 36)]
+
+            buffer += pre + post
+            if(buffer.length > 65536) {
+                yield buffer
+                buffer = ""
+            }
+        }
+        yield buffer + body.substring(lastMatchEnd, body.length)
+    }
+
+    /**
+     *
      * @param contents
      * @param findTokens
      * @param findSubtokens
@@ -53,24 +77,6 @@ export abstract class MultiPass extends Local {
             yield buffer
         }
         return contentsShort.substring(popularTokens.lastMatchEnd)
-    }
-
-    /**
-     *
-     * @param body
-     * @param strings
-     */
-    *replaceSymbolsOut(body: string, strings: string[]) {
-        let m
-        let lastMatchEnd = 0
-        const base36Match = /([a-z0-9]+)/g
-        while (m = base36Match.exec(body)) {
-            const pre = body.substring(lastMatchEnd, base36Match.lastIndex - m[1].length)
-            lastMatchEnd = base36Match.lastIndex
-            const post = strings[parseInt(m[1], 36)]
-            yield pre + post
-        }
-        yield body.substring(lastMatchEnd, body.length)
     }
 
     decode(contents: string) {
