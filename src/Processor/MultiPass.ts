@@ -61,7 +61,7 @@ export abstract class MultiPass extends Local {
             }
             yield buffer + t.token.substring(t.lastMatchEnd, contentsShort.length) + "\n"
         }
-        yield "\n\n"
+        yield "\n"
 
         let buffer = ""
         for (const t of popularTokens.chunks) {
