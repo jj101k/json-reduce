@@ -59,10 +59,10 @@ export abstract class MultiPass extends Local {
     *replaceSymbolsOut(body: string, strings: string[]) {
         let m
         let lastMatchEnd = 0
-        const re = /([a-z0-9]+)/g
-        while (m = re.exec(body)) {
-            const pre = body.substring(lastMatchEnd, re.lastIndex - m[1].length)
-            lastMatchEnd = re.lastIndex
+        const base36Match = /([a-z0-9]+)/g
+        while (m = base36Match.exec(body)) {
+            const pre = body.substring(lastMatchEnd, base36Match.lastIndex - m[1].length)
+            lastMatchEnd = base36Match.lastIndex
             const post = strings[parseInt(m[1], 36)]
             yield pre + post
         }
@@ -70,16 +70,16 @@ export abstract class MultiPass extends Local {
     }
 
     decode(contents: string) {
-        const [header1, header2, body] = contents.split(/\n\n/)
-        const strings1 = header1.split("\n")
+        const [subtokenBlock, tokenBlockIn, body] = contents.split(/\n\n/)
+        const subtokens = subtokenBlock.split("\n")
 
-        let stringsI = ""
-        for(const o of this.replaceSymbolsOut(header2, strings1)) {
-            stringsI += o
+        let tokenBlock = ""
+        for(const o of this.replaceSymbolsOut(tokenBlockIn, subtokens)) {
+            tokenBlock += o
         }
 
-        const strings = stringsI.split("\n")
+        const tokens = tokenBlock.split("\n")
 
-        return this.replaceSymbolsOut(body, strings)
+        return this.replaceSymbolsOut(body, tokens)
     }
 }
