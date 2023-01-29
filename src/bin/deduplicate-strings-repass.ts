@@ -33,6 +33,9 @@ if(opts.d) {
         let l = 0, i = 0
         let contents
         while((contents = await fd.read({buffer})).bytesRead > 0) {
+            if(i > 0) {
+                process.stdout.write("\n\n")
+            }
             i++
             handlerChunks = handler.encodeBlock(contents.buffer.toString("utf-8"), filename)
             for(const chunk of handlerChunks) {
