@@ -20,8 +20,11 @@ export class DeduplicateStringsRepass extends MultiPass {
             const chunks: Chunk[] = []
             let lastMatchEnd = 0
             let tokenMatch: RegExpMatchArray | null
-            while (tokenMatch = findTokens.exec(contents)) {
-                const token = tokenMatch[1]
+
+            const symbolWithPossiblePrefix = /^([[\]{},:\s]*)([a-z]+|-?[1-9][0-9]*(?:[.][0-9]+)?(?:e[+-][1-9][0-9]*)?|"[^"]*(?:\\.[^"]*)*")/
+            while(tokenMatch = contents.substring(lastMatchEnd).match(symbolWithPossiblePrefix)) {
+                const preamble = tokenMatch[1]
+                const token = tokenMatch[2]
 
                 let tokenFoundOffset = tokenFoundOffsets.get(token)
                 if (tokenFoundOffset === undefined) {
@@ -48,11 +51,11 @@ export class DeduplicateStringsRepass extends MultiPass {
                 }
 
                 chunks.push({
-                    pre: {start: lastMatchEnd, finish: findTokens.lastIndex - token.length},
+                    pre: {start: lastMatchEnd, finish: lastMatchEnd + preamble.length},
                     post: tokenFoundOffset
                 })
 
-                lastMatchEnd = findTokens.lastIndex
+                lastMatchEnd += preamble.length + token.length
             }
             const b = new Date()
             if (this.debug) {
