@@ -20,6 +20,9 @@ export abstract class MultiPass extends Local {
             const pre = body.substring(lastMatchEnd, base36Match.lastIndex - ref.length)
             lastMatchEnd = base36Match.lastIndex
             const post = strings[parseInt(ref, 36)]
+            if(post === undefined) {
+                throw new Error(`Internal error: token "${ref}" is not defined at ...${body.substring(base36Match.lastIndex - ref.length - 10, base36Match.lastIndex + 10)}...`)
+            }
 
             buffer += pre + post
             if(buffer.length > 65536) {

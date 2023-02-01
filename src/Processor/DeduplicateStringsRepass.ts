@@ -64,6 +64,10 @@ export class DeduplicateStringsRepass extends MultiPass {
 
             const subtokens = [...subtokensFound.entries()]
 
+            if(!contents.substring(lastMatchEnd).match(/^([[\]{},:\s\r\n]*)$/)) {
+                console.warn(`Stopped at ${lastMatchEnd} of ${contents.length}, with [${contents.substring(lastMatchEnd - 20, lastMatchEnd)}]${contents.substring(lastMatchEnd, lastMatchEnd + 20)}`)
+            }
+
             return {
                 chunks,
                 tokens: tokensFound,
