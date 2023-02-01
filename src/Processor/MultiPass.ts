@@ -16,9 +16,10 @@ export abstract class MultiPass extends Local {
         const base36Match = /([a-z0-9]+)/g
         let buffer = ""
         while (m = base36Match.exec(body)) {
-            const pre = body.substring(lastMatchEnd, base36Match.lastIndex - m[1].length)
+            const ref = m[1]
+            const pre = body.substring(lastMatchEnd, base36Match.lastIndex - ref.length)
             lastMatchEnd = base36Match.lastIndex
-            const post = strings[parseInt(m[1], 36)]
+            const post = strings[parseInt(ref, 36)]
 
             buffer += pre + post
             if(buffer.length > 65536) {
