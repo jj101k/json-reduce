@@ -21,7 +21,7 @@ export class DeduplicateStringsRepass extends MultiPass {
             let lastMatchEnd = 0
             let tokenMatch: RegExpMatchArray | null
 
-            const symbolWithPossiblePrefix = /^([[\]{},:\s]*)([a-z]+|-?[1-9][0-9]*(?:[.][0-9]+)?(?:e[+-][1-9][0-9]*)?|"[^"]*(?:\\.[^"]*)*")/
+            const symbolWithPossiblePrefix = /^([[\]{},:\s\r\n]*)([a-z]+|0|-?[1-9][0-9]*(?:[.][0-9]+)?(?:e[+-][1-9][0-9]*)?|"[^"\\]*(?:\\.[^"\\]*)*")/
             while(tokenMatch = contents.substring(lastMatchEnd).match(symbolWithPossiblePrefix)) {
                 const preamble = tokenMatch[1]
                 const token = tokenMatch[2]
