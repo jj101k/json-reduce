@@ -37,7 +37,8 @@ if(opts.d) {
                 process.stdout.write("\n\n")
             }
             i++
-            handlerChunks = handler.encodeBlock(contents.buffer.toString("utf-8"), filename)
+            const s = contents.buffer.toString("utf-8", 0, contents.bytesRead)
+            handlerChunks = handler.encodeBlock(s, filename)
             for(const chunk of handlerChunks) {
                 l += chunk.length
                 process.stdout.write(chunk)
