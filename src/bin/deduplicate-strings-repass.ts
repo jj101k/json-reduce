@@ -44,7 +44,7 @@ if(opts.d) {
                 process.stdout.write(chunk)
             }
         }
-        handler.encodeFinish(filename)
+        process.stdout.write(handler.encodeFinish(filename))
         console.warn(`${i} outer chunks totalling ${l} bytes`)
     })()
 }
