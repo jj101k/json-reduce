@@ -1,3 +1,5 @@
+import { Chunk } from "./Chunk"
+import { PreBlock } from "./PreBlock"
 import { SinglePass } from "./SinglePass"
 
 /**
@@ -16,11 +18,11 @@ export class DeduplicateStringsSort extends SinglePass {
             const infoByToken = new Map<string, {count: number, offset: number}>()
             let nextTokenInfoOffset = 0
 
-            let chunks = []
+            let chunks: Chunk[] = []
             let lastMatchEnd = 0
-            let match
+            let match: RegExpMatchArray | null
             while (match = re.exec(contents)) {
-                const pre: [number, number] = [lastMatchEnd, re.lastIndex - match[1].length]
+                const pre: PreBlock = {start: lastMatchEnd, finish: re.lastIndex - match[1].length}
                 lastMatchEnd = re.lastIndex
 
                 let tokenInfo = infoByToken.get(match[1])

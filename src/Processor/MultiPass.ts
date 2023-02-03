@@ -11,7 +11,7 @@ export abstract class MultiPass extends Local {
      * @param strings
      */
     private *replaceSymbolsOut(body: string, strings: string[]) {
-        let match
+        let match: RegExpMatchArray | null
         let lastMatchEnd = 0
         const base36Match = /([a-z0-9]+)/g
         let buffer = ""
