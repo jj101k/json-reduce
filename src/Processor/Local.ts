@@ -84,4 +84,33 @@ export abstract class Local {
         this.lastChunk = null
         return lastChunk.chunk
     }
+
+    /**
+     *
+     * @param fd Eg. from fsPromises.open()
+     * @param out Eg. NodeJS.WriteStream (like process.stdout)
+     */
+    async encodeStream(fd: {read(b: {buffer: Buffer}): Promise<{bytesRead: number}>}, out: {write(s: string): any}) {
+        let handlerChunks: Generator<string>
+        const buffer = Buffer.alloc(65536)
+        const uid = "" + Math.random()
+        let l = 0, i = 0
+        let bytesRead
+        while((bytesRead = (await fd.read({buffer})).bytesRead) > 0) {
+            if(i > 0) {
+                out.write("\n\n")
+            }
+            i++
+            const s = buffer.toString("utf-8", 0, bytesRead)
+            handlerChunks = this.encodeBlock(s, uid)
+            for(const chunk of handlerChunks) {
+                l += chunk.length
+                out.write(chunk)
+            }
+        }
+        out.write(this.encodeFinish(uid))
+        if(this.debug) {
+            console.warn(`${i} outer chunks totalling ${l} bytes`)
+        }
+    }
 }
