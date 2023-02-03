@@ -19,12 +19,12 @@ export class TestHandler {
                 const contents = `{"a-c":1,"b-c":1, "d": {"a:b/c":true}}`
 
                 let encoded = ""
-                for(const e of driver.encode(contents)) {
-                    encoded += e
+                for(const block of driver.encode(contents)) {
+                    encoded += block
                 }
                 let decoded = ""
-                for(const d of driver.decode(encoded)) {
-                    decoded += d
+                for(const block of driver.decode(encoded)) {
+                    decoded += block
                 }
                 const sumi = ReferenceStats.getCanonicalSumFor(decoded)
                 const sum = ReferenceStats.getCanonicalSumFor(contents)
@@ -35,12 +35,12 @@ export class TestHandler {
                 const contents = ReferenceStats.getSmallContents()
 
                 let encoded = ""
-                for(const e of driver.encode(contents)) {
-                    encoded += e
+                for(const block of driver.encode(contents)) {
+                    encoded += block
                 }
                 let decoded = ""
-                for(const d of driver.decode(encoded)) {
-                    decoded += d
+                for(const block of driver.decode(encoded)) {
+                    decoded += block
                 }
                 const sumi = ReferenceStats.getCanonicalSumFor(decoded)
                 const sum = ReferenceStats.getCanonicalSumFor(contents)
@@ -54,17 +54,17 @@ export class TestHandler {
 
                 const contents = ReferenceStats.getContents()
 
-                const a = new Date()
+                const before = new Date()
 
                 let encoded = ""
-                for(const e of driver.encode(contents)) {
-                    encoded += e
+                for(const block of driver.encode(contents)) {
+                    encoded += block
                 }
                 encodedCached = encoded
 
-                const b = new Date()
+                const after = new Date()
 
-                console.log(`Encode time for ${name} is ${(b.valueOf() - a.valueOf())}ms, versus ${reference.encode}ms`)
+                console.log(`Encode time for ${name} is ${(after.valueOf() - before.valueOf())}ms, versus ${reference.encode}ms`)
             })
             it("encodes to a reasonable size", () => {
                 const contents = ReferenceStats.getContents()
@@ -77,8 +77,8 @@ export class TestHandler {
                 this.timeout(reference.decode * decodeThreshold)
 
                 let decoded = ""
-                for(const d of driver.decode(encodedCached!)) {
-                    decoded += d
+                for(const block of driver.decode(encodedCached!)) {
+                    decoded += block
                 }
                 decodedCached = decoded
             })

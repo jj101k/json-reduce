@@ -11,37 +11,37 @@ export class DeduplicateStringsSort extends SinglePass {
      * @returns
      */
     orderedPopularTokens(contents: string, re: RegExp) {
-        const a = new Date()
+        const before = new Date()
         try {
-            const seen = new Map<string, {c: number, i: number}>()
-            let i = 0
+            const infoByToken = new Map<string, {count: number, offset: number}>()
+            let nextTokenInfoOffset = 0
 
             let chunks = []
             let lastMatchEnd = 0
-            let m
-            while (m = re.exec(contents)) {
-                const pre: [number, number] = [lastMatchEnd, re.lastIndex - m[1].length]
+            let match
+            while (match = re.exec(contents)) {
+                const pre: [number, number] = [lastMatchEnd, re.lastIndex - match[1].length]
                 lastMatchEnd = re.lastIndex
 
-                let s = seen.get(m[1])
-                if (!s) {
-                    s = { c: 0, i: i++ }
-                    seen.set(m[1], s)
+                let tokenInfo = infoByToken.get(match[1])
+                if (!tokenInfo) {
+                    tokenInfo = { count: 0, offset: nextTokenInfoOffset++ }
+                    infoByToken.set(match[1], tokenInfo)
                 }
-                s.c++
+                tokenInfo.count++
 
-                chunks.push({ pre, post: s.i })
+                chunks.push({ pre, post: tokenInfo.offset })
             }
 
             return {
                 chunks,
-                tokens: [...seen.entries()].sort(([ak, av], [bk, bv]) => +bv.c - av.c).map(([k, v]) => <[string, number]>[k, v.i]),
+                tokens: [...infoByToken.entries()].sort(([ak, av], [bk, bv]) => +bv.count - av.count).map(([k, v]) => <[string, number]>[k, v.offset]),
                 lastMatchEnd,
             }
         } finally {
-            const b = new Date()
+            const after = new Date()
             if (this.debug) {
-                console.warn(`Ordering tokens took ${b.valueOf() - a.valueOf()}ms`)
+                console.warn(`Ordering tokens took ${after.valueOf() - before.valueOf()}ms`)
             }
         }
     }

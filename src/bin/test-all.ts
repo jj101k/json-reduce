@@ -25,18 +25,18 @@ const testers = {
     deduplicateStringsSortRepass: DeduplicateStringsSortRepass,
 }
 for(const [name, codec] of Object.entries(testers)) {
-    const a = new Date()
+    const beforeAll = new Date()
     const handler = new codec()
     let encoded = ""
-    for(const e of handler.encode(contents)) {
-        encoded += e
+    for(const block of handler.encode(contents)) {
+        encoded += block
     }
-    const b = new Date()
+    const afterEncode = new Date()
     let decoded = ""
-    for(const d of handler.decode(encoded)) {
-        decoded += d
+    for(const block of handler.decode(encoded)) {
+        decoded += block
     }
-    const c = new Date()
+    const afterDecode = new Date()
 
     const sumi = createHash("sha256").update(canonicalise_json(decoded)).digest("base64")
 
@@ -44,5 +44,5 @@ for(const [name, codec] of Object.entries(testers)) {
         console.error(`Fail: ${sumi} != ${sum}`)
     }
     const sizei = encoded.length
-    console.log(`${name}: ${sizei} (${(sizei * 100 / size).toFixed(1)}%) ${b.valueOf()-a.valueOf()}ms/${c.valueOf()-b.valueOf()}ms`)
+    console.log(`${name}: ${sizei} (${(sizei * 100 / size).toFixed(1)}%) ${afterEncode.valueOf()-beforeAll.valueOf()}ms/${afterDecode.valueOf()-afterEncode.valueOf()}ms`)
 }
