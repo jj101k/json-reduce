@@ -1,3 +1,4 @@
+import { Chunk } from "./Chunk"
 import { Local } from "./Local"
 
 /**
@@ -10,11 +11,11 @@ export abstract class SinglePass extends Local {
      * @param tokens
      * @returns
      */
-    *replaceSymbolsIn(contents: string, tokens: { chunks: { pre: [number, number], post: number }[], tokens: [string, number][], lastMatchEnd: number }) {
+    *replaceSymbolsIn(contents: string, tokens: { chunks: Chunk[], tokens: [string, number][], lastMatchEnd: number }) {
         const tokenRefOffsets = tokens.tokens.map(([_, i], offset) => [i, offset]).sort(([ai], [bi]) => ai - bi).map(([_, offset]) => offset)
 
         for (const chunk of tokens.chunks) {
-            const pre = contents.substring(chunk.pre[0], chunk.pre[1])
+            const pre = contents.substring(chunk.pre.start, chunk.pre.finish)
             const post = tokenRefOffsets[chunk.post].toString(36)
             yield pre + post
         }
@@ -27,7 +28,7 @@ export abstract class SinglePass extends Local {
      * @param strings
      */
     *replaceSymbolsOut(body: string, strings: string[]) {
-        let match
+        let match: RegExpMatchArray | null
         let lastMatchEnd = 0
         const re = /([a-z0-9]+)/g
         while (match = re.exec(body)) {
