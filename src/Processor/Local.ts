@@ -90,11 +90,11 @@ export abstract class Local {
      * @param fd Eg. from fsPromises.open()
      * @param out Eg. NodeJS.WriteStream (like process.stdout)
      */
-    async encodeStream(fd: {read(b: {buffer: Buffer}): Promise<{bytesRead: number}>}, out: {write(s: string): any}) {
+    async encodeStream(fd: {read(bufferConfig: {buffer: Buffer}): Promise<{bytesRead: number}>}, out: {write(content: string): any}) {
         let handlerChunks: Generator<string>
         const buffer = Buffer.alloc(65536)
         const uid = "" + Math.random()
-        let l = 0
+        let totalLength = 0
         let outerChunkNumber: number
         let bytesRead = (await fd.read({buffer})).bytesRead
         for(outerChunkNumber = 0; bytesRead > 0; bytesRead = (await fd.read({buffer})).bytesRead, outerChunkNumber++) {
@@ -102,16 +102,16 @@ export abstract class Local {
                 out.write("\n\n")
             }
             outerChunkNumber++
-            const s = buffer.toString("utf-8", 0, bytesRead)
-            handlerChunks = this.encodeBlock(s, uid)
+            const inputChunk = buffer.toString("utf-8", 0, bytesRead)
+            handlerChunks = this.encodeBlock(inputChunk, uid)
             for(const chunk of handlerChunks) {
-                l += chunk.length
+                totalLength += chunk.length
                 out.write(chunk)
             }
         }
         out.write(this.encodeFinish(uid))
         if(this.debug) {
-            console.warn(`${outerChunkNumber} outer chunks totalling ${l} bytes`)
+            console.warn(`${outerChunkNumber} outer chunks totalling ${totalLength} bytes`)
         }
     }
 }

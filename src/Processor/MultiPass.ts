@@ -11,12 +11,12 @@ export abstract class MultiPass extends Local {
      * @param strings
      */
     private *replaceSymbolsOut(body: string, strings: string[]) {
-        let m
+        let match
         let lastMatchEnd = 0
         const base36Match = /([a-z0-9]+)/g
         let buffer = ""
-        while (m = base36Match.exec(body)) {
-            const ref = m[1]
+        while (match = base36Match.exec(body)) {
+            const ref = match[1]
             const pre = body.substring(lastMatchEnd, base36Match.lastIndex - ref.length)
             lastMatchEnd = base36Match.lastIndex
             const post = strings[parseInt(ref, 36)]
@@ -52,25 +52,25 @@ export abstract class MultiPass extends Local {
 
         yield popularTokens.subtokenBlock + "\n\n"
 
-        for(const t of popularTokens.tokens) {
+        for(const tokenInfo of popularTokens.tokens) {
             let buffer = ""
-            for(const c of t.chunks) {
-                const pre = t.token.substring(c.pre.start, c.pre.finish)
-                const post = popularTokens.subtokenOffsets[c.post].toString(36)
+            for(const chunk of tokenInfo.chunks) {
+                const pre = tokenInfo.token.substring(chunk.pre.start, chunk.pre.finish)
+                const post = popularTokens.subtokenOffsets[chunk.post].toString(36)
                 buffer += pre + post
                 if(buffer.length > 65536) {
                     yield buffer
                     buffer = ""
                 }
             }
-            yield buffer + t.token.substring(t.lastMatchEnd, contentsShort.length) + "\n"
+            yield buffer + tokenInfo.token.substring(tokenInfo.lastMatchEnd, contentsShort.length) + "\n"
         }
         yield "\n"
 
         let buffer = ""
-        for (const t of popularTokens.chunks) {
-            const pre = contentsShort.substring(t.pre.start, t.pre.finish)
-            const post = popularTokens.tokenOffsets[t.post].toString(36)
+        for (const chunk of popularTokens.chunks) {
+            const pre = contentsShort.substring(chunk.pre.start, chunk.pre.finish)
+            const post = popularTokens.tokenOffsets[chunk.post].toString(36)
             buffer += pre + post
             if(buffer.length > 65536) {
                 yield buffer
@@ -88,8 +88,8 @@ export abstract class MultiPass extends Local {
         const subtokens = subtokenBlock.split("\n")
 
         let tokenBlock = ""
-        for(const o of this.replaceSymbolsOut(tokenBlockIn, subtokens)) {
-            tokenBlock += o
+        for(const chunk of this.replaceSymbolsOut(tokenBlockIn, subtokens)) {
+            tokenBlock += chunk
         }
 
         const tokens = tokenBlock.split("\n")

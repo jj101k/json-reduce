@@ -8,7 +8,7 @@ import { SeenToken } from "./SeenToken"
  */
 export class DeduplicateStringsRepass extends MultiPass {
     popularTokens(contents: string, findTokens: RegExp, findSubtokens: RegExp): PopularTokens {
-        const a = new Date()
+        const before = new Date()
         try {
             const tokensFound: Array<SeenToken> = []
             const tokenFoundOffsets = new Map<string, number>()
@@ -57,9 +57,9 @@ export class DeduplicateStringsRepass extends MultiPass {
 
                 lastMatchEnd += preamble.length + token.length
             }
-            const b = new Date()
+            const afterFindTokens = new Date()
             if (this.debug) {
-                console.warn(`Finding tokens (a) took ${b.valueOf() - a.valueOf()}ms`)
+                console.warn(`Finding tokens (a) took ${afterFindTokens.valueOf() - before.valueOf()}ms`)
             }
 
             const subtokens = [...subtokensFound.entries()]
@@ -73,9 +73,9 @@ export class DeduplicateStringsRepass extends MultiPass {
                 tokenOffsets: tokensFound.map((_, offset) => offset),
             }
         } finally {
-            const b = new Date()
+            const afterMap = new Date()
             if (this.debug) {
-                console.warn(`Finding tokens took ${b.valueOf() - a.valueOf()}ms`)
+                console.warn(`Finding tokens took ${afterMap.valueOf() - before.valueOf()}ms`)
             }
         }
     }

@@ -39,7 +39,7 @@ export class DeduplicateStringsSortRepass extends MultiPass {
     }
 
     popularTokens(contents: string, findTokens: RegExp, findSubtokens: RegExp): PopularTokens {
-        const a = new Date()
+        const before = new Date()
         try {
             const tokensFound: Array<SeenPopularToken> = []
             const tokenFoundOffsets = new Map<string, number>()
@@ -90,9 +90,9 @@ export class DeduplicateStringsSortRepass extends MultiPass {
                 })
                 lastMatchEnd = findTokens.lastIndex
             }
-            const b = new Date()
+            const afterFindTokens = new Date()
             if (this.debug) {
-                console.warn(`Finding tokens (a) took ${b.valueOf() - a.valueOf()}ms`)
+                console.warn(`Finding tokens (a) took ${afterFindTokens.valueOf() - before.valueOf()}ms`)
             }
 
             const subtokens = this.popularSortWriteBack(subtokensFound)
@@ -108,9 +108,9 @@ export class DeduplicateStringsSortRepass extends MultiPass {
                 tokenOffsets: tokensFound.map(({popularity}) => tokensFound.length - popularity - 1),
             }
         } finally {
-            const b = new Date()
+            const afterMap = new Date()
             if (this.debug) {
-                console.warn(`Finding tokens took ${b.valueOf() - a.valueOf()}ms`)
+                console.warn(`Finding tokens took ${afterMap.valueOf() - before.valueOf()}ms`)
             }
         }
     }

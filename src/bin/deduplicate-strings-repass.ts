@@ -20,12 +20,12 @@ if(opts.d) {
 } else if(opts.s) {
     const contents = fs.readFileSync(filename, {encoding: "utf-8"})
     handlerChunks = handler.encode(contents)
-    let l = 0
+    let totalLength = 0
     for(const chunk of handlerChunks) {
-        l += chunk.length
+        totalLength += chunk.length
         process.stdout.write(chunk)
     }
-    console.warn(`${l} bytes`)
+    console.warn(`${totalLength} bytes`)
 } else {
     fsPromises.open(filename).then(
         fd => handler.encodeStream(fd, process.stdout)

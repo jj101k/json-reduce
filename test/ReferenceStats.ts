@@ -41,17 +41,17 @@ export class ReferenceStats {
                 const sum = createHash("sha256").update(contents).digest("base64")
                 const size = contents.length
 
-                const a = new Date()
+                const before = new Date()
                 let encoded = ""
-                for(const e of ReferencePureJS.encode(contents)) {
-                    encoded += e
+                for(const block of ReferencePureJS.encode(contents)) {
+                    encoded += block
                 }
-                const b = new Date()
+                const afterEncode = new Date()
                 let decoded = ""
-                for(const d of ReferencePureJS.decode(encoded)) {
-                    decoded += d
+                for(const block of ReferencePureJS.decode(encoded)) {
+                    decoded += block
                 }
-                const c = new Date()
+                const afterDecode = new Date()
 
                 const sumi = createHash("sha256").update(decoded).digest("base64")
 
@@ -59,7 +59,7 @@ export class ReferenceStats {
                     throw new Error(`Reference driver failed: ${sumi} != ${sum}`)
                 }
                 const sizei = encoded.length
-                return {encode: b.valueOf()-a.valueOf(), decode: c.valueOf()-b.valueOf(), ratio: sizei / size}
+                return {encode: afterEncode.valueOf()-before.valueOf(), decode: afterDecode.valueOf()-afterEncode.valueOf(), ratio: sizei / size}
             })()
         }
         return this.stats

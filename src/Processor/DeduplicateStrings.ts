@@ -11,36 +11,36 @@ export class DeduplicateStrings extends SinglePass {
      * @returns
      */
     popularTokens(contents: string, re: RegExp) {
-        const a = new Date()
+        const before = new Date()
         try {
-            const seen = new Map<string, {i: number}>()
-            let i = 0
+            const tokenOffsets = new Map<string, {offset: number}>()
+            let nextSeenEntry = 0
 
             let chunks = []
             let lastMatchEnd = 0
-            let m
-            while (m = re.exec(contents)) {
-                const pre: [number, number] = [lastMatchEnd, re.lastIndex - m[1].length]
+            let match
+            while (match = re.exec(contents)) {
+                const pre: [number, number] = [lastMatchEnd, re.lastIndex - match[1].length]
                 lastMatchEnd = re.lastIndex
 
-                let s = seen.get(m[1])
-                if (!s) {
-                    s = { i: i++ }
-                    seen.set(m[1], s)
+                let tokenOffset = tokenOffsets.get(match[1])
+                if (!tokenOffset) {
+                    tokenOffset = { offset: nextSeenEntry++ }
+                    tokenOffsets.set(match[1], tokenOffset)
                 }
 
-                chunks.push({ pre, post: s.i })
+                chunks.push({ pre, post: tokenOffset.offset })
             }
 
             return {
                 chunks,
-                tokens: [...seen.entries()].map(([k, v]) => <[string, number]>[k, v.i]),
+                tokens: [...tokenOffsets.entries()].map(([k, v]) => <[string, number]>[k, v.offset]),
                 lastMatchEnd,
             }
         } finally {
-            const b = new Date()
+            const after = new Date()
             if (this.debug) {
-                console.warn(`Finding tokens took ${b.valueOf() - a.valueOf()}ms`)
+                console.warn(`Finding tokens took ${after.valueOf() - before.valueOf()}ms`)
             }
         }
     }
