@@ -27,24 +27,7 @@ if(opts.d) {
     }
     console.warn(`${l} bytes`)
 } else {
-    (async () => {
-        const fd = await fsPromises.open(filename)
-        const buffer = Buffer.alloc(65536)
-        let l = 0, i = 0
-        let contents
-        while((contents = await fd.read({buffer})).bytesRead > 0) {
-            if(i > 0) {
-                process.stdout.write("\n\n")
-            }
-            i++
-            const s = contents.buffer.toString("utf-8", 0, contents.bytesRead)
-            handlerChunks = handler.encodeBlock(s, filename)
-            for(const chunk of handlerChunks) {
-                l += chunk.length
-                process.stdout.write(chunk)
-            }
-        }
-        process.stdout.write(handler.encodeFinish(filename))
-        console.warn(`${i} outer chunks totalling ${l} bytes`)
-    })()
+    fsPromises.open(filename).then(
+        fd => handler.encodeStream(fd, process.stdout)
+    )
 }
