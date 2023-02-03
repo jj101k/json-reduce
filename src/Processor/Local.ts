@@ -94,13 +94,14 @@ export abstract class Local {
         let handlerChunks: Generator<string>
         const buffer = Buffer.alloc(65536)
         const uid = "" + Math.random()
-        let l = 0, i = 0
-        let bytesRead
-        while((bytesRead = (await fd.read({buffer})).bytesRead) > 0) {
-            if(i > 0) {
+        let l = 0
+        let outerChunkNumber: number
+        let bytesRead = (await fd.read({buffer})).bytesRead
+        for(outerChunkNumber = 0; bytesRead > 0; bytesRead = (await fd.read({buffer})).bytesRead, outerChunkNumber++) {
+            if(outerChunkNumber > 0) {
                 out.write("\n\n")
             }
-            i++
+            outerChunkNumber++
             const s = buffer.toString("utf-8", 0, bytesRead)
             handlerChunks = this.encodeBlock(s, uid)
             for(const chunk of handlerChunks) {
@@ -110,7 +111,7 @@ export abstract class Local {
         }
         out.write(this.encodeFinish(uid))
         if(this.debug) {
-            console.warn(`${i} outer chunks totalling ${l} bytes`)
+            console.warn(`${outerChunkNumber} outer chunks totalling ${l} bytes`)
         }
     }
 }
