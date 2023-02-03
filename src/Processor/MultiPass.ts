@@ -46,7 +46,7 @@ export abstract class MultiPass extends Local {
         const contentsShort = this.shortenIfNeeded(contents)
 
         // Quoted strings, or barewords like "true", or numbers
-        const symbolMatch = /("[^"\\]*(?:\\.[^"\\]*)*"|[a-z0-9]+)/g
+        const symbolMatch = /^([[\]{},:\s\r\n]*)([a-z]+|0|-?[1-9][0-9]*(?:[.][0-9]+)?(?:e[+-][1-9][0-9]*)?|"[^"\\]*(?:\\.[^"\\]*)*")/
         const subtokenMatch = /([a-zA-Z0-9]+)/g
         const popularTokens = this.popularTokens(contentsShort, symbolMatch, subtokenMatch)
 
