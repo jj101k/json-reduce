@@ -84,7 +84,9 @@ export abstract class MultiPass extends Local {
     }
 
     *decodeBlock(contents: string) {
-        const [subtokenBlock, tokenBlockIn, body] = contents.split("\n\n", 3)
+        const internalSeparator = "\n\n"
+        const externalSeparator = "\n\n"
+        const [subtokenBlock, tokenBlockIn, body] = contents.split(internalSeparator, 3)
         const subtokens = subtokenBlock.split("\n")
 
         let tokenBlock = ""
@@ -96,6 +98,8 @@ export abstract class MultiPass extends Local {
 
         yield *this.replaceSymbolsOut(body, tokens)
 
-        return subtokenBlock.length + 2 + tokenBlockIn.length + 2 + body.length + 2
+        return subtokenBlock.length + internalSeparator.length +
+            tokenBlockIn.length + internalSeparator.length + body.length +
+            externalSeparator.length
     }
 }
