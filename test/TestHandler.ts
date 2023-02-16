@@ -10,7 +10,7 @@ export class TestHandler {
      * @param name
      * @param driver
      */
-    static testDriver(name: string, driver: {decode(s: string): Iterable<string>, encode(s: string): Iterable<string>}) {
+    static testDriver(name: string, encoder: {encode(s: string): Iterable<string>}, decoder: {decode(s: string): Iterable<string>}) {
         const decodeThreshold = 7
         let decodedCached: string | null = null
         let encodedCached: string | null = null
@@ -19,11 +19,11 @@ export class TestHandler {
                 const contents = `{"a-c":1,"b-c":1, "d": {"a:b/c":true}}`
 
                 let encoded = ""
-                for(const block of driver.encode(contents)) {
+                for(const block of encoder.encode(contents)) {
                     encoded += block
                 }
                 let decoded = ""
-                for(const block of driver.decode(encoded)) {
+                for(const block of decoder.decode(encoded)) {
                     decoded += block
                 }
                 const sumi = ReferenceStats.getCanonicalSumFor(decoded)
@@ -35,11 +35,11 @@ export class TestHandler {
                 const contents = ReferenceStats.getSmallContents()
 
                 let encoded = ""
-                for(const block of driver.encode(contents)) {
+                for(const block of encoder.encode(contents)) {
                     encoded += block
                 }
                 let decoded = ""
-                for(const block of driver.decode(encoded)) {
+                for(const block of decoder.decode(encoded)) {
                     decoded += block
                 }
                 const sumi = ReferenceStats.getCanonicalSumFor(decoded)
@@ -57,7 +57,7 @@ export class TestHandler {
                 const before = new Date()
 
                 let encoded = ""
-                for(const block of driver.encode(contents)) {
+                for(const block of encoder.encode(contents)) {
                     encoded += block
                 }
                 encodedCached = encoded
@@ -77,7 +77,7 @@ export class TestHandler {
                 this.timeout(reference.decode * decodeThreshold)
 
                 let decoded = ""
-                for(const block of driver.decode(encodedCached!)) {
+                for(const block of decoder.decode(encodedCached!)) {
                     decoded += block
                 }
                 decodedCached = decoded
