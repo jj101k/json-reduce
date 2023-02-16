@@ -18,7 +18,7 @@ if(opts.d) {
         process.stdout.write(chunk)
     }
 } else {
-    const handler = new Encode.DeduplicateStringsRepass()
+    const handler = new Encode.MultiPass.Unsorted()
     if(opts.s) {
         const contents = fs.readFileSync(filename, {encoding: "utf-8"})
         handlerChunks = handler.encode(contents)
