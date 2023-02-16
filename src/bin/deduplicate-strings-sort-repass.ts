@@ -14,7 +14,7 @@ if(opts.d) {
     const handler = new Decode.MultiPass()
     handlerChunks = handler.decode(contents)
 } else {
-    const handler = new Encode.DeduplicateStringsSortRepass()
+    const handler = new Encode.MultiPass.Sorted()
     handlerChunks = handler.encode(contents)
 }
 for(const chunk of handlerChunks) {

@@ -14,7 +14,7 @@ if(opts.d) {
     const handler = new Decode.SinglePass()
     handlerChunks = handler.decode(contents)
 } else {
-    const handler = new Encode.DeduplicateStrings()
+    const handler = new Encode.SinglePass.Unsorted()
     handlerChunks = handler.encode(contents)
 }
 for(const chunk of handlerChunks) {

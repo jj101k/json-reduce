@@ -1,5 +1,3 @@
 export * from "./Base"
-export * from "./DeduplicateStrings"
-export * from "./DeduplicateStringsRepass"
-export * from "./DeduplicateStringsSort"
-export * from "./DeduplicateStringsSortRepass"
+export * as MultiPass from "./MultiPass"
+export * as SinglePass from "./SinglePass"

@@ -1,10 +1,10 @@
-import { Chunk } from "./Chunk"
-import { Local } from "./Base"
+import { Chunk } from "../Chunk"
+import { Base as EncodeBase } from "../Base"
 
 /**
  *
  */
-export abstract class SinglePass extends Local {
+export abstract class Base extends EncodeBase {
     /**
      *
      * @param contents

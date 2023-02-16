@@ -1,52 +1,20 @@
-import { Chunk } from "./Chunk"
-import { MultiPass } from "./MultiPass"
+import { Chunk } from "../Chunk"
 import { PopularTokens } from "./PopularTokens"
 import { SeenToken } from "./SeenToken"
+import { Base } from "./Base"
 
 /**
  *
  */
-interface SeenPopularSubtoken {
-    popularity: number
-    token: string
-}
-
-/**
- *
- */
-interface SeenPopularToken extends SeenToken {
-    popularity: number
-}
-
-/**
- *
- */
-export class DeduplicateStringsSortRepass extends MultiPass {
-    /**
-     *
-     * @param ts
-     */
-    private popularSortWriteBack<T extends {popularity: number}>(ts: T[]) {
-        const sorted = ts.slice().sort((av, bv) => bv.popularity - av.popularity)
-
-        // Build abstract popularity
-        let effectivePopularity = sorted.length
-        for(const st of sorted) {
-            st.popularity = --effectivePopularity
-        }
-
-        return sorted
-    }
-
+export class Unsorted extends Base {
     popularTokens(contents: string, findTokens: RegExp, findSubtokens: RegExp): PopularTokens {
         const before = new Date()
         try {
-            const tokensFound: Array<SeenPopularToken> = []
+            const tokensFound: Array<SeenToken> = []
             const tokenFoundOffsets = new Map<string, number>()
             let currentToken = 0
 
-            const subtokensFound: Array<SeenPopularSubtoken> = []
-            const subtokenFoundOffsets = new Map<string, number>()
+            const subtokensFound = new Map<string, number>()
             let currentSubtoken = 0
 
             const chunks: Chunk[] = []
@@ -64,32 +32,28 @@ export class DeduplicateStringsSortRepass extends MultiPass {
                     let subtokenLastMatchEnd = 0
                     while(subtokenMatch = findSubtokens.exec(token)) {
                         const subtoken = subtokenMatch[1]
-                        let subtokenFoundOffset = subtokenFoundOffsets.get(subtoken)
-                        if(subtokenFoundOffset === undefined) {
-                            subtokenFoundOffset = currentSubtoken++
-                            subtokenFoundOffsets.set(subtoken, subtokenFoundOffset)
-                            subtokensFound.push({popularity: 0, token: subtoken})
+                        let subtokenFound = subtokensFound.get(subtoken)
+                        if(subtokenFound === undefined) {
+                            subtokenFound = currentSubtoken++
+                            subtokensFound.set(subtoken, subtokenFound)
                         }
-                        subtokensFound[subtokenFoundOffset].popularity++
                         subtokenChunks.push({
                             pre: {start: subtokenLastMatchEnd, finish: findSubtokens.lastIndex - subtoken.length},
-                            post: subtokenFoundOffset,
+                            post: subtokenFound,
                         })
-
                         subtokenLastMatchEnd = findSubtokens.lastIndex
                     }
                     tokenFoundOffset = currentToken++
 
                     tokenFoundOffsets.set(token, tokenFoundOffset)
-                    tokensFound.push({chunks: subtokenChunks, lastMatchEnd: subtokenLastMatchEnd, token: token, popularity: 0})
+                    tokensFound.push({chunks: subtokenChunks, lastMatchEnd: subtokenLastMatchEnd, token: token})
                 }
-
-                tokensFound[tokenFoundOffset].popularity++
 
                 chunks.push({
                     pre: {start: lastMatchEnd, finish: lastMatchEnd + preamble.length},
                     post: tokenFoundOffset
                 })
+
                 lastMatchEnd += preamble.length + token.length
             }
             const afterFindTokens = new Date()
@@ -97,17 +61,15 @@ export class DeduplicateStringsSortRepass extends MultiPass {
                 console.warn(`Finding tokens (a) took ${afterFindTokens.valueOf() - before.valueOf()}ms`)
             }
 
-            const subtokens = this.popularSortWriteBack(subtokensFound)
-
-            const tokens = this.popularSortWriteBack(tokensFound)
+            const subtokens = [...subtokensFound.entries()]
 
             return {
                 chunks,
-                tokens,
+                tokens: tokensFound,
                 lastMatchEnd,
-                subtokenBlock: subtokens.map(v => v.token).join("\n"),
-                subtokenOffsets: subtokensFound.map(({popularity}) => subtokensFound.length - popularity - 1),
-                tokenOffsets: tokensFound.map(({popularity}) => tokensFound.length - popularity - 1),
+                subtokenBlock: subtokens.map(([k]) => k).join("\n"),
+                subtokenOffsets: subtokens.map((_, offset) => offset),
+                tokenOffsets: tokensFound.map((_, offset) => offset),
             }
         } finally {
             const afterMap = new Date()

@@ -1,11 +1,11 @@
-import { Chunk } from "./Chunk"
-import { PreBlock } from "./PreBlock"
-import { SinglePass } from "./SinglePass"
+import { Chunk } from "../Chunk"
+import { PreBlock } from "../PreBlock"
+import { Base } from "./Base"
 
 /**
  *
  */
-export class DeduplicateStringsSort extends SinglePass {
+export class Sorted extends Base {
     /**
      *
      * @param contents

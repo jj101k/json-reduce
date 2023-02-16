@@ -1,10 +1,10 @@
-import { Local } from "./Base"
+import { Base as EncodeBase } from "../Base"
 import { PopularTokens } from "./PopularTokens"
 
 /**
  *
  */
-export abstract class MultiPass extends Local {
+export abstract class Base extends EncodeBase {
     /**
      *
      * @param contents
