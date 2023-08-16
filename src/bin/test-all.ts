@@ -1,10 +1,7 @@
-import path from "path"
 import * as fs from "fs"
-import { DeduplicateStrings } from "../Processor/DeduplicateStrings"
-import { DeduplicateStringsSort } from "../Processor/DeduplicateStringsSort"
-import { DeduplicateStringsRepass } from "../Processor/DeduplicateStringsRepass"
-import { DeduplicateStringsSortRepass } from "../Processor/DeduplicateStringsSortRepass"
 import { createHash } from "node:crypto"
+import path from "path"
+import { Decode, Encode } from ".."
 
 const wd = path.dirname(process.argv[1])
 const [filename] = process.argv.slice(2)
@@ -18,22 +15,21 @@ const contents = fs.readFileSync(filename, {encoding: "utf-8"})
 const sum = createHash("sha256").update(canonicalise_json(contents)).digest("base64")
 const size = fs.statSync(filename).size
 console.log(filename, sum, size)
-const testers = {
-    deduplicateStrings: DeduplicateStrings,
-    deduplicateStringsSort: DeduplicateStringsSort,
-    deduplicateStringsRepass: DeduplicateStringsRepass,
-    deduplicateStringsSortRepass: DeduplicateStringsSortRepass,
+const testers: Record<string, [Encode.Base, Decode.Base]> = {
+    deduplicateStrings: [new Encode.SinglePass.Unsorted(), new Decode.SinglePass()],
+    deduplicateStringsSort: [new Encode.SinglePass.Sorted(), new Decode.SinglePass()],
+    deduplicateStringsRepass: [new Encode.MultiPass.Unsorted(), new Decode.MultiPass()],
+    deduplicateStringsSortRepass: [new Encode.MultiPass.Sorted(), new Decode.MultiPass()],
 }
-for(const [name, codec] of Object.entries(testers)) {
+for(const [name, [enc, dec]] of Object.entries(testers)) {
     const beforeAll = new Date()
-    const handler = new codec()
     let encoded = ""
-    for(const block of handler.encode(contents)) {
+    for(const block of enc.encode(contents)) {
         encoded += block
     }
     const afterEncode = new Date()
     let decoded = ""
-    for(const block of handler.decode(encoded)) {
+    for(const block of dec.decode(encoded)) {
         decoded += block
     }
     const afterDecode = new Date()

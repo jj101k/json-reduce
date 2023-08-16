@@ -1,7 +1,7 @@
 /**
  *
  */
-export abstract class Local {
+export abstract class Base {
     /**
      *
      */

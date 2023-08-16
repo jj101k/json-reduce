@@ -1,9 +1,9 @@
-import { Local } from "./Base"
+import { Base } from "./Base"
 
 /**
  *
  */
-export class MultiPass extends Local {
+export class MultiPass extends Base {
     /**
      *
      * @param body

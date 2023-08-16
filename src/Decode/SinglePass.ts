@@ -1,9 +1,9 @@
-import { Local } from "./Base"
+import { Base } from "./Base"
 
 /**
  *
  */
-export class SinglePass extends Local {
+export class SinglePass extends Base {
     /**
      *
      * @param body
